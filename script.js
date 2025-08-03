@@ -1,14 +1,11 @@
 ;(function(){
-  // 1) Base URL de ton GitHub Pages
   const BASE = 'https://aromecafeine.github.io/calculateur-maturite-tracking/';
 
-  // 2) Charger Chart.js depuis ton domaine
   const s = document.createElement('script');
   s.src = BASE + 'chart.js';
   s.onload = init;
   document.head.appendChild(s);
 
-  // 3) Quand Chart est prêt, on injecte tout
   function init(){
     // ▷ Injecter le CSS
     const css = `
@@ -30,8 +27,14 @@
     style.textContent = css;
     document.head.appendChild(style);
 
-    // ▷ Injecter le HTML
-    const html = `
+    // ▷ Injecter le HTML DANS LE CONTAINER
+    const container = document.getElementById('widget-container');
+    if (!container) {
+      console.error('widget-container introuvable');
+      return;
+    }
+
+    container.innerHTML = `
       <div id="tc-calculator">
         <input id="tc-url" class="tc-input" type="url" placeholder="https://votre-site.com">
         <button id="tc-scan-btn" class="tc-button">Analyser</button>
@@ -44,24 +47,19 @@
         <div id="tc-error"></div>
       </div>
     `;
-    document.currentScript.insertAdjacentHTML('beforebegin', html);
 
-    // ▷ Règles de scoring (regex valides !)
+    // ▷ Règles de scoring
     const rules = [
-      { desc:"GTM absent",                 rx:/gtm\.js/i,                                              pts:-20, invert:true },
-      { desc:"GA4 en dur",          rx:/\/gtag\/js\?id=G-/i,            pts:-10 },
-      { desc:"Universal Analytics",        rx:/(analytics\.js|UA-\d+)/i,                               pts:-15          },
-      { desc:"CMP manquant",               rx:/(?:sdk\.privacy-center\.org|axeptio|tarteaucitron|cookiebot|onetrust|didomi|iubenda|quantcast)/i,
-                                                                             pts:-10, invert:true },
-      { desc:"Cookies marketing",          rx:/(?:_ga(?:\w+)?|_gid|_gat|_fbp|gcl(?:au|aw|dc)|li_fat_id|hubspotutk|calltrk|nimbata|mkto_trk|optimizely|ajs\w*)(?==)/i,
-                                                                             pts:-20          },
-      { desc:"Tracking en dur",            rx:/(?:connect\.facebook\.net|analytics\.tiktok\.com|px\.ads\.linkedin\.com|cdn\.segment\.com|static\.hotjar\.com|www\.clarity\.ms|bat\.bing\.com|cdn\.callrail)/i,
-                                                                             pts:-10          },
-      { desc:"Server-side absent",         rx:/https:\/\/(?:analytics|sst|tracking)\./i,               pts:-10, invert:true },
-      { desc:"Addingwell détecté",         rx:/awl=/i,                                                 pts:+10          }
+      { desc:"GTM absent",                 rx:/gtm\.js/i, pts:-20, invert:true },
+      { desc:"GA4 en dur",                 rx:/\/gtag\/js\?id=G-/i, pts:-10 },
+      { desc:"Universal Analytics",        rx:/(analytics\.js|UA-\d+)/i, pts:-15 },
+      { desc:"CMP manquant",               rx:/(?:sdk\.privacy-center\.org|axeptio|tarteaucitron|cookiebot|onetrust|didomi|iubenda|quantcast)/i, pts:-10, invert:true },
+      { desc:"Cookies marketing",          rx:/(?:_ga(?:\w+)?|_gid|_gat|_fbp|gcl(?:au|aw|dc)|li_fat_id|hubspotutk|calltrk|nimbata|mkto_trk|optimizely|ajs\w*)(?==)/i, pts:-20 },
+      { desc:"Tracking en dur",            rx:/(?:connect\.facebook\.net|analytics\.tiktok\.com|px\.ads\.linkedin\.com|cdn\.segment\.com|static\.hotjar\.com|www\.clarity\.ms|bat\.bing\.com|cdn\.callrail)/i, pts:-10 },
+      { desc:"Server-side absent",         rx:/https:\/\/(?:analytics|sst|tracking)\./i, pts:-10, invert:true },
+      { desc:"Addingwell détecté",         rx:/awl=/i, pts:+10 }
     ];
 
-    // ▷ Ciblage des éléments
     const btn      = document.getElementById('tc-scan-btn'),
           urlIn    = document.getElementById('tc-url'),
           spinner  = document.getElementById('tc-spinner'),
@@ -71,7 +69,6 @@
           errorEl  = document.getElementById('tc-error');
     let gauge;
 
-    // ▷ Événement “click”
     btn.addEventListener('click', async ()=>{
       const url = urlIn.value.trim();
       try { new URL(url); } catch { return showError('URL invalide'); }
@@ -81,7 +78,6 @@
       results.style.display = 'none';
 
       try {
-        // on utilise /get pour avoir CORS OK
         const res  = await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url));
         const json = await res.json();
         const html = json.contents;
@@ -95,7 +91,6 @@
           }
         });
 
-        // double balisage
         const dupCount = (html.match(/<script[^>]+(gtm\.js|fbevents\.js|analytics\.js)/gi)||[]).length;
         if (dupCount > 1) {
           score -= 5;
@@ -104,7 +99,6 @@
 
         score = Math.max(0, Math.min(100, score));
 
-        // afficher le gauge
         if (gauge) gauge.destroy();
         gauge = new Chart(
           document.getElementById('tc-gauge').getContext('2d'),
@@ -115,7 +109,6 @@
           }
         );
 
-        // afficher score & 3 issues
         scoreEl.textContent = `Score : ${score}/100`;
         issuesEl.innerHTML = found
           .sort((a,b)=>a.pts - b.pts)

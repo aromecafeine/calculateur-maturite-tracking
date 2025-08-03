@@ -49,7 +49,7 @@
     // ▷ Règles de scoring (regex valides !)
     const rules = [
       { desc:"GTM absent",                 rx:/gtm\.js/i,                                              pts:-20, invert:true },
-      { desc:"GA4 en dur",                 rx:/\/gtag\/js\?id=G-/i,                                    pts:-10          },
+      { desc:"GA4 en dur",          rx:/\/gtag\/js\?id=G-/i,            pts:-10 },
       { desc:"Universal Analytics",        rx:/(analytics\.js|UA-\d+)/i,                               pts:-15          },
       { desc:"CMP manquant",               rx:/(?:sdk\.privacy-center\.org|axeptio|tarteaucitron|cookiebot|onetrust|didomi|iubenda|quantcast)/i,
                                                                              pts:-10, invert:true },

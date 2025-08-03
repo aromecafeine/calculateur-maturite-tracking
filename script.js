@@ -4,7 +4,7 @@
 
   // 1. Charger Chart.js depuis votre domaine
   const s = document.createElement('script')
-  s.src = BASE + 'chart.min.js'
+  s.src = BASE + 'chart.js'
   s.onload = init
   document.head.appendChild(s)
 

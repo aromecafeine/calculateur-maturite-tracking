@@ -5,7 +5,7 @@
   if (typeof Chart === 'undefined') {
     console.log('📦 Chargement de Chart.js...');
     const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js';
+    s.src = 'https://aromecafeine.github.io/calculateur-maturite-tracking/chart.js';
     s.onload = init;
     s.onerror = () => {
       console.error('❌ Erreur de chargement de Chart.js');
@@ -899,14 +899,21 @@
       console.log('📊 Nombre d’issues :', allIssues.length);
     }
 
+
     /** Affichage du gauge Chart */
     function displayGauge(score) {
+      // Si Chart.js n'est pas encore chargé, attendre et réessayer
       if (typeof Chart === 'undefined') {
-        console.warn('⏳ Chart.js pas encore prêt, retry dans 100ms...');
         if (!window.chartRetryCount) window.chartRetryCount = 0;
-        if (window.chartRetryCount < 20) { window.chartRetryCount++; setTimeout(() => displayGauge(score), 200); }
+        if (window.chartRetryCount < 20) {
+          window.chartRetryCount++;
+          setTimeout(() => displayGauge(score), 200);
+        } else {
+          console.error('❌ Chart.js introuvable après 20 tentatives.');
+        }
         return;
       }
+
       const ctx = document.getElementById('tc-gauge').getContext('2d');
       if (gauge) gauge.destroy();
 
@@ -938,42 +945,73 @@
             'Critique - action urgente';
     }
 
-    /** Affiche la description globale et les recommandations */
-    function displayScoreDetails(score, issues) {
-      elements.scoreDescription.textContent =
-        issues.length === 0
-          ? "Configuration optimale détectée."
-          : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
+    const ctx = document.getElementById('tc-gauge').getContext('2d');
+    if (gauge) gauge.destroy();
 
-      elements.recommendationsContent.innerHTML = issues
-        .map(i => `• ${i.recommendation}`)
-        .join('<br>');
-    }
+    let color = '#28a745';
+    if (score < 50) color = '#dc3545';
+    else if (score < 75) color = '#fd7e14';
 
-    /** Affiche les issues avec détails repliables */
-    function displayIssues(issues) {
-      elements.issues.innerHTML = '';
-      if (issues.length === 0) {
-        elements.issues.innerHTML = `<li class="tc-issue" style="border-color:#28a745; border-left-color:#28a745; background:#f0f8f0;">
+    gauge = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [score, 100 - score],
+          backgroundColor: [color, '#e9ecef'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        cutout: '70%',
+        rotation: -90,
+        circumference: 180,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+      }
+    });
+
+    elements.score.textContent = score;
+    elements.scoreStatus.textContent =
+      score >= 75 ? 'Bon niveau' :
+        score >= 50 ? 'Moyen - amélioration possible' :
+          'Critique - action urgente';
+  }
+
+  /** Affiche la description globale et les recommandations */
+  function displayScoreDetails(score, issues) {
+    elements.scoreDescription.textContent =
+      issues.length === 0
+        ? "Configuration optimale détectée."
+        : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
+
+    elements.recommendationsContent.innerHTML = issues
+      .map(i => `• ${i.recommendation}`)
+      .join('<br>');
+  }
+
+  /** Affiche les issues avec détails repliables */
+  function displayIssues(issues) {
+    elements.issues.innerHTML = '';
+    if (issues.length === 0) {
+      elements.issues.innerHTML = `<li class="tc-issue" style="border-color:#28a745; border-left-color:#28a745; background:#f0f8f0;">
           <div class="tc-issue-content">
             <span class="tc-issue-name">✅ Aucune anomalie détectée</span>
             <span class="tc-issue-points" style="background:#28a745;">Parfait</span>
           </div>
         </li>`;
-        return;
-      }
+      return;
+    }
 
-      issues.forEach((issue, idx) => {
-        const li = document.createElement('li');
-        li.className = 'tc-issue tc-issue-expandable';
-        li.style.borderColor = issue.category === 'critical' ? '#dc3545' :
-          issue.category === 'warning' ? '#fd7e14' :
-            '#28a745';
-        li.style.borderLeftColor = li.style.borderColor;
-        li.style.background = '#fff';
+    issues.forEach((issue, idx) => {
+      const li = document.createElement('li');
+      li.className = 'tc-issue tc-issue-expandable';
+      li.style.borderColor = issue.category === 'critical' ? '#dc3545' :
+        issue.category === 'warning' ? '#fd7e14' :
+          '#28a745';
+      li.style.borderLeftColor = li.style.borderColor;
+      li.style.background = '#fff';
 
-        const detailsId = `tc-issue-details-${idx}`;
-        li.innerHTML = `
+      const detailsId = `tc-issue-details-${idx}`;
+      li.innerHTML = `
           <div class="tc-issue-content">
             <div class="tc-issue-info">
               <div class="tc-issue-name">
@@ -988,9 +1026,9 @@
           <div id="${detailsId}" class="tc-issue-details">${issue.details}</div>
         `;
 
-        elements.issues.appendChild(li);
-      });
-    }
+      elements.issues.appendChild(li);
+    });
+  }
 
-  } // end initializeCalculator
-})(); 
+} // end initializeCalculator
+}) (); 

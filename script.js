@@ -1,4 +1,5 @@
 
+// script.js
 (function(){
   console.log('🚀 Audit Tracking – Initialisation du script');
 
@@ -228,4 +229,5 @@
   document.addEventListener('DOMContentLoaded', function(){
     init();
 });
+
 })();

@@ -8,44 +8,37 @@
   <!-- Google Fonts Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <!-- Chart.js depuis votre domaine GitHub Pages -->
+  <!-- Chart.js (nécessaire pour le gauge) -->
   <script src="https://aromecafeine.github.io/calculateur-maturite-tracking/chart.js" defer></script>
-  
-  <!-- Votre widget -->
+  <!-- Votre script métier -->
   <script src="https://aromecafeine.github.io/calculateur-maturite-tracking/script.js" defer></script>
 </head>
-<br>
-<body style="margin:0;padding:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#f5f3f0 0%,#e8e4df 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;">
+<body style="margin:0;padding:0;font-family:'Poppins',sans-serif;
+             background:linear-gradient(135deg,#004aad 0%,#336EBF 100%);
+             min-height:100vh;display:flex;align-items:center;justify-content:center;">
 
   <div style="text-align:center;margin-bottom:30px;padding:20px;">
-    <h1 style="color:#505942;font-size:2em;margin-bottom:20px;">Ton tracking tient-il la route ?</h1>
-    <p style="color:#666;font-size:1.1em;margin-bottom:30px;">Testez votre configuration de tracking web</p>
+    <h1 style="color:white;font-size:2em;margin-bottom:20px;">Ton tracking tient-il la route ?</h1>
+    <p style="color:rgba(255,255,255,0.9);font-size:1.1em;margin-bottom:30px;">Testez votre configuration de tracking web</p>
     
     <!-- Conteneur d'injection -->
     <div id="widget-container"></div>
     
-    <noscript style="background:#ffe6e6;border:1px solid #ffcccc;border-radius:12px;padding:20px;color:#cc0000;display:block;margin-top:20px;">
+    <noscript style="background:#ffe6e6;border:1px solid #ffcccc;border-radius:12px;
+                   padding:20px;color:#cc0000;display:block;margin-top:20px;">
       ⚠️ Ce widget nécessite JavaScript activé.
     </noscript>
   </div>
 
   <style>
     @keyframes spin {
-      0% { transform: rotate(0deg); }
+      0%   { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
     @media (max-width: 768px) {
-      body {
-        padding: 10px !important;
-      }
-      
-      #widget-container {
-        padding: 20px !important;
-        margin: 10px !important;
-      }
+      body { padding: 10px !important; }
+      #widget-container { padding: 20px !important; margin:10px !important; }
     }
   </style>
-
 </body>
 </html>

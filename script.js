@@ -1,99 +1,4 @@
-function displayIssues(allIssues, technicalFindings) {
-      elements.issues.innerHTML = '';
-
-      if (allIssues.length === 0) {
-        const li = document.createElement('li');
-        li.className = 'tc-issue';
-        li.style.background = '#f0f8f0';
-        li.style.borderColor = '#d4edda20';
-        li.style.borderLeftColor = '#28a745';
-        li.innerHTML = `
-          <div class="tc-issue-content">
-            <span class="tc-issue-name">✅ Configuration optimale détectée !</span>
-            <span class="tc-issue-points" style="background:#28a745;">Parfait</span>
-          </div>
-        `;
-        elements.issues.appendChild(li);
-        return;
-      }
-
-      allIssues.slice(0, 8).forEach((issue, index) => {
-        const li = document.createElement('li');
-        li.className = 'tc-issue tc-issue-expandable';
-        const isPositive = issue.points > 0;
-        const pointsText = isPositive ? `+${issue.points}` : `${issue.points}`;
-        
-        let borderColor, bgColor, badgeColor;
-        if (isPositive) {
-          borderColor = '#28a745';
-          bgColor = '#f0f8f0';
-          badgeColor = '#28a745';
-        } else if (issue.category === 'critical') {
-          borderColor = '#dc3545';
-          bgColor = '#fff5f5';
-          badgeColor = '#dc3545';
-        } else {
-          borderColor = '#fd7e14';
-          bgColor = '#fff8f3';
-          badgeColor = '#fd7e14';
-        }
-
-        li.style.background = bgColor;
-        li.style.borderColor = borderColor + '20';
-        li.style.borderLeftColor = borderColor;
-        
-        const detailsId = `details-${index}`;
-        const hasDetails = issue.details || issue.solution;
-        
-        li.innerHTML = `
-          <div class="tc-issue-content">
-            <div class="tc-issue-info">
-              <div class="tc-issue-name">
-                ${issue.name}
-                ${hasDetails ? `<span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')">Voir détails</span>` : ''}
-                <span class="tc-recommendation-link" onclick="scrollToRecommendations()">→ Solution</span>
-              </div>
-              <div class="tc-issue-description">${issue.description}</div>
-              ${hasDetails ? `
-                <div id="${detailsId}" class="tc-issue-details">
-                  ${issue.details ? `<div><strong>Explication:</strong> ${issue.details}</div>` : ''}
-                  ${issue.solution ? `<div style="margin-top:    function createGauge(score) {
-      if (gauge) gauge.destroy();
-
-      const ctx = document.getElementById('tc-gauge').getContext('2d');
-      
-      // Couleur basée sur le score - nouveau système
-      let gaugeColor;
-      if (score >= 75) {
-        gaugeColor = '#28a745'; // Vert
-      } else if (score >= 50) {
-        gaugeColor = '#fd7e14'; // Orange
-      } else {
-        gaugeColor = '#dc3545'; // Rouge
-      }
-
-      gauge = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [score, 100 - score],
-            backgroundColor: [gaugeColor, '#e0e0e0'],
-            borderWidth: 0,
-            cutout: '70%'
-          }]
-        },
-        options: {
-          plugins: {
-            tooltip: { enabled: false },
-            legend: { display: false }
-          },
-          responsive: true,
-          maintainAspectRatio: true
-        }
-      });
-      
-      console.log('📊 Gauge créé avec score:', score, 'couleur:', gaugeColor);
-    };(function(){
+(function(){
   console.log('🚀 Calculateur Tracking - Initialisation du script');
   
   const BASE = 'https://aromecafeine.github.io/calculateur-maturite-tracking/';
@@ -121,7 +26,7 @@ function displayIssues(allIssues, technicalFindings) {
   function init(){
     console.log('🎨 Injection du CSS et HTML');
     
-    // ▷ Injecter le CSS complet
+    // ▷ Injecter le CSS complet avec système de couleurs #004aad
     const css = `
       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
       
@@ -129,7 +34,7 @@ function displayIssues(allIssues, technicalFindings) {
         margin: 0;
         padding: 0;
         font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #004aad 0%, #0066ff 100%);
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -203,7 +108,7 @@ function displayIssues(allIssues, technicalFindings) {
       }
       
       .tc-step.completed {
-        background: #28a745;
+        background: #66aaff;
         color: white;
       }
       
@@ -482,7 +387,7 @@ function displayIssues(allIssues, technicalFindings) {
       }
       
       .tc-recommendations {
-        background: #f8f9ff;
+        background: #f0f5ff;
         border-left: 4px solid #004aad;
         padding: 15px;
         border-radius: 8px;
@@ -535,12 +440,16 @@ function displayIssues(allIssues, technicalFindings) {
       }
       
       .tc-issue-info {
+        flex: 1;
       }
       
       .tc-issue-name {
         color: #333;
         font-weight: 500;
         margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
       
       .tc-issue-description {
@@ -582,8 +491,9 @@ function displayIssues(allIssues, technicalFindings) {
       .tc-issue-toggle {
         color: #004aad;
         font-size: 0.8em;
-        margin-left: 10px;
         font-weight: 500;
+        cursor: pointer;
+        text-decoration: underline;
       }
       
       .tc-recommendation-link {
@@ -594,7 +504,6 @@ function displayIssues(allIssues, technicalFindings) {
         border-radius: 12px;
         font-size: 0.75em;
         text-decoration: none;
-        margin-left: 8px;
         cursor: pointer;
       }
       
@@ -604,13 +513,18 @@ function displayIssues(allIssues, technicalFindings) {
       
       .tc-error {
         display: none;
-        background: #ffe6e6;
-        border: 1px solid #ffcccc;
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
         border-radius: 12px;
         padding: 20px;
-        color: #cc0000;
+        color: #c62828;
         text-align: center;
         margin-top: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
       
       @media (max-width: 768px) {
@@ -772,7 +686,7 @@ function displayIssues(allIssues, technicalFindings) {
       step3: document.getElementById('step-3')
     };
 
-    // Règles de scoring simplifiées et fonctionnelles
+    // Règles de scoring avec système de couleurs #004aad
     const rules = [
       { 
         name: "GTM absent", 
@@ -876,6 +790,21 @@ function displayIssues(allIssues, technicalFindings) {
       if (e.key === 'Enter') elements.button.click();
     });
 
+    // Fonction globale pour les détails
+    window.toggleDetails = function(detailsId) {
+      const details = document.getElementById(detailsId);
+      if (details) {
+        details.classList.toggle('expanded');
+      }
+    };
+
+    window.scrollToRecommendations = function() {
+      const recommendations = document.querySelector('.tc-recommendations');
+      if (recommendations) {
+        recommendations.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
     // Navigation entre étapes
     function handleUrlStep() {
       const url = elements.urlInput.value.trim();
@@ -928,346 +857,4 @@ function displayIssues(allIssues, technicalFindings) {
       elements.step1.innerHTML = '1';
       elements.step2.classList.remove('active');
       
-      hideError();
-    }
-
-    async function handleAnalysis() {
-      console.log('🔍 Début de l\'analyse');
-      
-      // Validation des champs
-      const name = elements.nameInput.value.trim();
-      const email = elements.emailInput.value.trim();
-      const url = elements.urlInput.value.trim();
-
-      if (!name) {
-        showError('Veuillez saisir votre prénom');
-        return;
-      }
-
-      if (!email || !email.includes('@')) {
-        showError('Veuillez saisir un email valide');
-        return;
-      }
-
-      if (!url) {
-        showError('Veuillez saisir une URL valide');
-        return;
-      }
-
-      // Validation URL
-      try {
-        new URL(url);
-      } catch {
-        showError('Format d\'URL invalide. Utilisez : https://exemple.com');
-        return;
-      }
-
-      console.log('✅ Validation réussie:', { name, email, url });
-
-      showLoading(true);
-      hideError();
-
-      try {
-        console.log('🌐 Récupération du contenu HTML...');
-        const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url));
-        const data = await response.json();
-        const html = data.contents;
-        
-        console.log('📄 HTML récupéré, taille:', html.length, 'caractères');
-
-        const analysisResult = analyzeHTML(html, url);
-        console.log('📊 Résultat d\'analyse:', analysisResult);
-        
-        displayResults(analysisResult, name);
-
-      } catch (error) {
-        console.error('❌ Erreur lors de l\'analyse:', error);
-        showError('Erreur lors de l\'analyse: ' + error.message);
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    function analyzeHTML(html, url) {
-      console.log('🔬 Analyse du HTML en cours...');
-      console.log('📄 Contenu analysé:', { url, htmlLength: html.length });
-      
-      let score = 100;
-      let issues = [];
-      let positivePoints = [];
-      let detectedElements = {};
-      let technicalFindings = {};
-
-      // Application des règles
-      rules.forEach(rule => {
-        const match = rule.regex.test(html);
-        const shouldApply = rule.invert ? !match : match;
-        
-        console.log(`🔍 Règle "${rule.name}":`, { 
-          regex: rule.regex.toString(), 
-          match, 
-          shouldApply, 
-          points: rule.points,
-          category: rule.category
-        });
-        
-        if (shouldApply) {
-          score += rule.points;
-          
-          if (rule.points > 0) {
-            positivePoints.push(rule);
-          } else {
-            issues.push(rule);
-          }
-          
-          detectedElements[rule.name] = true;
-        }
-
-        // Collecte des éléments techniques détectés
-        if (match) {
-          const matches = html.match(new RegExp(rule.regex.source, 'gi'));
-          technicalFindings[rule.name] = {
-            detected: match,
-            count: matches ? matches.length : 0,
-            samples: matches ? matches.slice(0, 3) : []
-          };
-        }
-      });
-
-      // Détection de doublons avec détails
-      const gtmMatches = html.match(/gtm\.js/gi) || [];
-      const gaMatches = html.match(/gtag\/js/gi) || [];
-      const fbMatches = html.match(/fbevents\.js/gi) || [];
-      
-      console.log('🔍 Analyse des doublons:', {
-        gtmCount: gtmMatches.length,
-        gaCount: gaMatches.length,
-        fbCount: fbMatches.length,
-        gtmSamples: gtmMatches.slice(0, 2),
-        gaSamples: gaMatches.slice(0, 2)
-      });
-      
-      if (gtmMatches.length > 1 || gaMatches.length > 1 || fbMatches.length > 1) {
-        score -= 5;
-        issues.push({
-          name: "Scripts dupliqués",
-          points: -5,
-          category: "warning",
-          description: "Plusieurs instances du même script détectées",
-          details: `GTM: ${gtmMatches.length} instances, GA: ${gaMatches.length} instances, FB: ${fbMatches.length} instances. Cela peut causer des conflits et des données dupliquées.`,
-          recommendation: "Supprimer les doublons",
-          solution: "Gardez une seule instance de chaque script, de préférence gérée via GTM."
-        });
-      }
-
-      // Analyse des cookies présents
-      const cookieMatches = html.match(/_ga[^=]*=|_gid[^=]*=|_fbp[^=]*=|gcl_[^=]*=/gi) || [];
-      console.log('🍪 Cookies détectés:', cookieMatches);
-
-      // Score final
-      score = Math.max(0, Math.min(100, score));
-      console.log('🎯 Score final calculé:', score);
-      console.log('📊 Résumé technique:', technicalFindings);
-
-      return {
-        score,
-        issues: issues.sort((a, b) => a.points - b.points),
-        positivePoints: positivePoints.sort((a, b) => b.points - a.points),
-        detectedElements,
-        technicalFindings,
-        url
-      };
-    }
-
-    function displayResults(data, userName) {
-      console.log('📱 Affichage des résultats');
-      console.log('🔍 Données complètes de l\'analyse:', data);
-      const { score, issues, positivePoints, technicalFindings } = data;
-
-      // Mise à jour du score
-      elements.score.textContent = score;
-      updateScoreStatus(score, userName);
-
-      // Création du gauge
-      createGauge(score);
-
-      // Affichage des issues et points positifs
-      displayIssues([...positivePoints, ...issues], technicalFindings);
-
-      // Recommandations liées
-      updateRecommendations(score, issues, positivePoints);
-
-      // Montrer les résultats
-      elements.results.style.display = 'block';
-      
-      console.log('✅ Résultats affichés avec succès');
-      console.log('📈 Analyse terminée - Score:', score, 'Issues:', issues.length, 'Points positifs:', positivePoints.length);
-    }
-
-    function updateScoreStatus(score, userName) {
-      let status, description, color;
-
-      if (score >= 75) {
-        status = "🏆 Excellent";
-        description = `Félicitations ${userName} ! Votre configuration tracking est optimale.`;
-        color = "#28a745";
-      } else if (score >= 50) {
-        status = "⚠️ À améliorer";
-        description = `${userName}, votre configuration nécessite des améliorations importantes.`;
-        color = "#fd7e14";
-      } else {
-        status = "🚨 Critique";
-        description = `${userName}, une refonte complète de votre tracking est nécessaire.`;
-        color = "#dc3545";
-      }
-
-      elements.scoreStatus.textContent = status;
-      elements.scoreStatus.style.color = color;
-      elements.scoreDescription.textContent = description;
-      
-      console.log('📊 Statut du score mis à jour:', { score, status, color });
-    }
-
-    function createGauge(score) {
-      if (gauge) gauge.destroy();
-
-      const ctx = document.getElementById('tc-gauge').getContext('2d');
-      
-      // Couleur basée sur le score
-      let gaugeColor;
-      if (score >= 85) gaugeColor = '#2ed573';
-      else if (score >= 70) gaugeColor = '#d99152';
-      else if (score >= 50) gaugeColor = '#ff6b35';
-      else gaugeColor = '#ff4757';
-
-      gauge = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [score, 100 - score],
-            backgroundColor: [gaugeColor, '#e0e0e0'],
-            borderWidth: 0,
-            cutout: '70%'
-          }]
-        },
-        options: {
-          plugins: {
-            tooltip: { enabled: false },
-            legend: { display: false }
-          },
-          responsive: true,
-          maintainAspectRatio: true
-        }
-      });
-      
-      console.log('📊 Gauge créé avec score:', score, 'couleur:', gaugeColor);
-    }
-
-    function displayIssues(allIssues) {
-      elements.issues.innerHTML = '';
-
-      if (allIssues.length === 0) {
-        const li = document.createElement('li');
-        li.className = 'tc-issue';
-        li.style.background = '#f0f8f0';
-        li.style.borderColor = '#d4edda20';
-        li.style.borderLeftColor = '#2ed573';
-        li.innerHTML = `
-          <div class="tc-issue-content">
-            <span class="tc-issue-name">✅ Aucun problème majeur détecté !</span>
-            <span class="tc-issue-points" style="background:#2ed573;">Parfait</span>
-          </div>
-        `;
-        elements.issues.appendChild(li);
-        return;
-      }
-
-      allIssues.slice(0, 6).forEach(issue => {
-        const li = document.createElement('li');
-        li.className = 'tc-issue';
-        const isPositive = issue.points > 0;
-        const pointsText = isPositive ? `+${issue.points}` : `${issue.points}`;
-        
-        let borderColor, bgColor, badgeColor;
-        if (isPositive) {
-          borderColor = '#2ed573';
-          bgColor = '#f0f8f0';
-          badgeColor = '#2ed573';
-        } else if (issue.category === 'critical') {
-          borderColor = '#ff4757';
-          bgColor = '#fff5f5';
-          badgeColor = '#ff4757';
-        } else {
-          borderColor = '#d99152';
-          bgColor = '#fdf8f3';
-          badgeColor = '#d99152';
-        }
-
-        li.style.background = bgColor;
-        li.style.borderColor = borderColor + '20';
-        li.style.borderLeftColor = borderColor;
-        
-        li.innerHTML = `
-          <div class="tc-issue-content">
-            <div class="tc-issue-info">
-              <div class="tc-issue-name">${issue.name}</div>
-              <div class="tc-issue-description">${issue.description}</div>
-            </div>
-            <span class="tc-issue-points" style="background:${badgeColor};">${pointsText} pts</span>
-          </div>
-        `;
-
-        elements.issues.appendChild(li);
-      });
-    }
-
-    function updateRecommendations(score, issues, positivePoints) {
-      let recommendations = [];
-
-      if (score >= 85) {
-        recommendations.push("Continuez sur cette excellente voie !");
-        recommendations.push("Pensez à surveiller régulièrement vos performances.");
-      } else if (score >= 70) {
-        recommendations.push("Implémentez GTM si ce n'est pas déjà fait.");
-        recommendations.push("Ajoutez une solution de gestion des cookies.");
-      } else {
-        recommendations.push("Priorité : installer Google Tag Manager.");
-        recommendations.push("Mettre en place un CMP conforme RGPD.");
-        recommendations.push("Centraliser tous vos tags via GTM.");
-      }
-
-      // Ajout de recommandations spécifiques
-      if (issues.some(i => i.name.includes('CMP'))) {
-        recommendations.push("Installez une solution CMP (Axeptio, Cookiebot, etc.)");
-      }
-      
-      if (positivePoints.length > 0) {
-        recommendations.unshift(`✅ Points forts détectés : ${positivePoints.map(p => p.name).join(', ')}`);
-      }
-
-      elements.recommendationsContent.innerHTML = recommendations
-        .slice(0, 4)
-        .map(rec => `• ${rec}`)
-        .join('<br>');
-    }
-
-    function showLoading(show) {
-      elements.spinner.style.display = show ? 'block' : 'none';
-      elements.results.style.display = show ? 'none' : elements.results.style.display;
-      elements.button.disabled = show;
-      elements.buttonText.textContent = show ? 'Analyse...' : 'Analyser';
-    }
-
-    function showError(message) {
-      console.error('❌ Erreur affichée:', message);
-      elements.errorMessage.textContent = message;
-      elements.errorMessage.style.display = 'block';
-    }
-
-    function hideError() {
-      elements.errorMessage.style.display = 'none';
-    }
-
-    console.log('✅ Calculateur Tracking initialisé avec succès');
-  }
-})();
+      hideError

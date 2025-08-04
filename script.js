@@ -1,27 +1,27 @@
 (function () {
-    console.log('🚀 Calculateur Tracking - Initialisation du script');
+  console.log('🚀 Calculateur Tracking - Initialisation du script');
 
-    // Chargement de Chart.js si pas déjà chargé
-    if (typeof Chart === 'undefined') {
-        console.log('📦 Chargement de Chart.js...');
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js';
-        s.onload = init;
-        s.onerror = () => {
-            console.error('❌ Erreur de chargement de Chart.js');
-            init(); // Continuer sans graphique
-        };
-        document.head.appendChild(s);
-    } else {
-        console.log('✅ Chart.js déjà chargé');
-        init();
-    }
+  // Chargement de Chart.js si pas déjà chargé
+  if (typeof Chart === 'undefined') {
+    console.log('📦 Chargement de Chart.js...');
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js';
+    s.onload = init;
+    s.onerror = () => {
+      console.error('❌ Erreur de chargement de Chart.js');
+      init(); // Continuer sans graphique
+    };
+    document.head.appendChild(s);
+  } else {
+    console.log('✅ Chart.js déjà chargé');
+    init();
+  }
 
-    function init() {
-        console.log('🎨 Injection du CSS et HTML');
+  function init() {
+    console.log('🎨 Injection du CSS et HTML');
 
-        // ▷ Injecter le CSS complet
-        const css = `
+    // ▷ Injecter le CSS complet
+    const css = `
       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
       
       body {
@@ -546,18 +546,18 @@
       }
     `;
 
-        const style = document.createElement('style');
-        style.textContent = css;
-        document.head.appendChild(style);
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
 
-        // ▷ Injecter le HTML DANS LE CONTAINER
-        const container = document.getElementById('widget-container');
-        if (!container) {
-            console.error('❌ widget-container introuvable');
-            return;
-        }
+    // ▷ Injecter le HTML DANS LE CONTAINER
+    const container = document.getElementById('widget-container');
+    if (!container) {
+      console.error('❌ widget-container introuvable');
+      return;
+    }
 
-        container.innerHTML = `
+    container.innerHTML = `
       <div id="tc-calculator">
         <div class="tc-hero-section">
           <div class="tc-hero-content">
@@ -651,312 +651,317 @@
       </div>
     `;
 
-        console.log('✅ HTML injecté avec succès');
-        initializeCalculator();
+    console.log('✅ HTML injecté avec succès');
+    initializeCalculator();
+  }
+
+  function initializeCalculator() {
+    console.log('⚙️ Initialisation du calculateur');
+
+    // Variables globales
+    let gauge = null;
+    let currentStep = 1;
+    const elements = {
+      spinner: document.getElementById('tc-spinner'),
+      button: document.getElementById('tc-scan-btn'),
+      buttonText: document.getElementById('tc-btn-text'),
+      urlInput: document.getElementById('tc-url'),
+      nameInput: document.getElementById('tc-name'),
+      emailInput: document.getElementById('tc-email'),
+      urlBtn: document.getElementById('tc-url-btn'),
+      backBtn: document.getElementById('tc-back-btn'),
+      results: document.getElementById('tc-results'),
+      score: document.getElementById('tc-score'),
+      scoreStatus: document.getElementById('tc-score-status'),
+      scoreDescription: document.getElementById('tc-score-description'),
+      recommendationsContent: document.getElementById('tc-recommendations-content'),
+      issues: document.getElementById('tc-issues'),
+      errorMessage: document.getElementById('tc-error'),
+      urlStep: document.getElementById('url-step'),
+      contactStep: document.getElementById('contact-step'),
+      step1: document.getElementById('step-1'),
+      step2: document.getElementById('step-2'),
+      step3: document.getElementById('step-3')
+    };
+
+    // Règles de scoring basées exactement sur votre document
+    const rules = [
+      {
+        name: "Absence de Google Tag Manager",
+        regex: /gtm\.js/i,
+        points: -20,
+        invert: true,
+        category: "critical",
+        description: "Aucune gouvernance des balises → site non industrialisé",
+        details: "GTM centralise la gestion de tous vos tags marketing et analytics. Sans GTM, vous perdez en flexibilité et en contrôle sur vos données.",
+        recommendation: "Installer GTM immédiatement"
+      },
+      {
+        name: "GA4 intégré en dur (gtag.js)",
+        regex: /\/gtag\/js\?id=G-/i,
+        points: -10,
+        category: "warning",
+        description: "Balise injectée sans GTM = tracking rigide, peu maintenable",
+        details: "GA4 est installé directement dans le code source au lieu d'être géré via GTM. Cela réduit votre flexibilité.",
+        recommendation: "Migrer GA4 vers GTM"
+      },
+      {
+        name: "Universal Analytics toujours actif",
+        regex: /analytics\.js|UA-[0-9]+/i,
+        points: -15,
+        category: "critical",
+        description: "analytics.js ou UA-XXXXX toujours présent = technologie obsolète",
+        details: "Universal Analytics a cessé de fonctionner en juillet 2023. Vos données ne sont plus collectées.",
+        recommendation: "Migrer vers GA4 - urgence absolue"
+      },
+      {
+        name: "Absence de bandeau ou CMP détectable",
+        regex: /sdk\.privacy-center\.org|sdk\.didomi\.io|scripts\.didomi\.io|api\.didomi\.io|static\.axept\.io|www\.axept\.io|cookie\.sirdata\.com|cmp\.sirdata\.com|cdn\.sirdata\.com|cdn-cookieyes\.com|cdn-cookieyes\.io|app\.cookieyes\.com|cdn\.iubenda\.com|iubenda\.com\/cmp|consent\.iubenda\.com|app\.usercentrics\.eu|consent\.cookiebot\.com|consentcdn\.cookiebot\.com|choice\.quantcast\.com|cmp\.quantcast\.com|consent\.trustarc\.com|cdn\.trustcommander\.net|cdn\.cookielaw\.org|cdn\.cookielaw\.net|cookie-cdn\.onetrust\.com|cmp\.[a-z0-9.-]+|consent\.[a-z0-9.-]+/i,
+        points: -10,
+        invert: true,
+        category: "critical",
+        description: "Pas de axeptio, tarteaucitron, cookiebot... détecté dans le code HTML",
+        details: "Le RGPD impose une gestion stricte des cookies. Sans CMP, vous risquez des amendes importantes.",
+        recommendation: "Installer un CMP conforme RGPD"
+      },
+      {
+        name: "Dépôt de cookies marketing sans consentement",
+        regex: /(?:^|;\s*)(?:_ga\w*|_gid|_gat|gclau|gclaw|gcldc|_fbp|fr|li_fat_id|UserMatchHistory|_ttp|_pinterest_sess|_pin_unauth|personalization_id|guest_id|hubspotutk|hjSessionUser\w+|_hjIncludedInPageviewSample|_uetvid|_uetsid|_calltrk|calltrk_landing|nimbata|sp_id|sp_ses|prism\w+|mkto_trk|visitor_id\d+|ceg\w+|mf\w+|optimizely\w*|ajs\w+)=/i,
+        points: -20,
+        category: "critical",
+        description: "Cookies déposés malgré l'absence d'interaction avec une CMP",
+        details: "Des cookies de tracking sont présents mais aucun système de consentement n'est visible.",
+        recommendation: "Conditionner les cookies au consentement"
+      },
+      {
+        name: "Outils de suivis intégrés en dur",
+        regex: /graph\.facebook\.com|snap\.licdn\.com\/li\.lms-analytics\/insight\.min\.js|px\.ads\.linkedin\.com\/collect|analytics\.tiktok\.com\/i18n\/pixel\/events\.js|business\.tiktok\.com|s\.pinimg\.com\/ct\/lib\/main\.[^/]+\.js|ct\.pinterest\.com\/v3\/|static\.ads-twitter\.com\/uwt\.js|analytics\.twitter\.com\/i\/adsct|js\.hs-scripts\.com|js\.hs-analytics\.com|hs-analytics\.net|hscollectedforms\.net|static\.hotjar\.com\/c\/hotjar-[^/]+\.js|script\.hotjar\.com\/modules\.[^/]+\.js|vars\.hotjar\.com|www\.clarity\.ms\/tag\/|bat\.bing\.com\/bat\.js|cdn\.callrail\.com|t\.calltrk\.com|cdn\.nimbata\.com|track\.nimbata\.com|sp\.analytics\.spotify\.com|spclient\.wg\.spotify\.com|cdn\.segment\.com|script\.crazyegg\.com|cdn\.mouseflow\.com|cdn\.optimizely\.com|munchkin\.marketo\.net|pi\.pardot\.com/i,
+        points: -10,
+        category: "warning",
+        description: "Tracking Facebook hors GTM = difficile à maintenir, non conforme",
+        details: "Les pixels de réseaux sociaux sont chargés directement, rendant difficile leur gestion et conformité.",
+        recommendation: "Centraliser via GTM"
+      },
+      {
+        name: "Server-side tracking non détecté",
+        regex: /https:\/\/(analytics|sst|tracking)\./i,
+        points: -10,
+        invert: true,
+        category: "warning",
+        description: "Pas de server-side détecté (sous-domaine analytics., sst., tracking.)",
+        details: "Le tracking client-side est limité par les bloqueurs de pub et les restrictions navigateurs.",
+        recommendation: "Implémenter le server-side tracking"
+      },
+      {
+        name: "Solution Addingwell détectée",
+        regex: /awl=/i,
+        points: +10,
+        category: "positive",
+        description: "Excellente pratique ! Solution de tracking avancé détectée",
+        details: "Addingwell offre une solution server-side premium pour optimiser la collecte de données.",
+        recommendation: "Continuer sur cette voie"
+      }
+    ];
+
+    // Event listeners
+    elements.urlBtn.addEventListener('click', handleUrlStep);
+    elements.button.addEventListener('click', handleAnalysis);
+    elements.backBtn.addEventListener('click', goBackToUrlStep);
+
+    elements.urlInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') elements.urlBtn.click();
+    });
+
+    elements.nameInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') elements.emailInput.focus();
+    });
+
+    elements.emailInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') elements.button.click();
+    });
+
+    // Fonction pour basculer les détails
+    window.toggleDetails = function (detailsId) {
+      const details = document.getElementById(detailsId);
+      const isExpanded = details.classList.contains('expanded');
+
+      if (isExpanded) {
+        details.classList.remove('expanded');
+      } else {
+        details.classList.add('expanded');
+      }
+    };
+
+    /** Gérer la transition vers l'étape contact */
+    function handleUrlStep() {
+      const url = elements.urlInput.value.trim();
+      if (!url) {
+        elements.errorMessage.textContent = 'Veuillez entrer une URL valide.';
+        elements.errorMessage.style.display = 'block';
+        return;
+      }
+      elements.errorMessage.style.display = 'none';
+      elements.urlStep.style.display = 'none';
+      elements.contactStep.style.display = 'block';
+      elements.step1.classList.remove('active');
+      elements.step1.classList.add('completed');
+      elements.step2.classList.add('active');
+      currentStep = 2;
+      console.log('➡️ Passage à l’étape 2 : saisie contact');
     }
 
-    function initializeCalculator() {
-        console.log('⚙️ Initialisation du calculateur');
+    /** Revenir à l’étape URL */
+    function goBackToUrlStep() {
+      elements.contactStep.style.display = 'none';
+      elements.urlStep.style.display = 'block';
+      elements.step2.classList.remove('active');
+      elements.step1.classList.add('active');
+      currentStep = 1;
+      console.log('⬅️ Retour à l’étape 1 : URL');
+    }
 
-        // Variables globales
-        let gauge = null;
-        let currentStep = 1;
-        const elements = {
-            spinner: document.getElementById('tc-spinner'),
-            button: document.getElementById('tc-scan-btn'),
-            buttonText: document.getElementById('tc-btn-text'),
-            urlInput: document.getElementById('tc-url'),
-            nameInput: document.getElementById('tc-name'),
-            emailInput: document.getElementById('tc-email'),
-            urlBtn: document.getElementById('tc-url-btn'),
-            backBtn: document.getElementById('tc-back-btn'),
-            results: document.getElementById('tc-results'),
-            score: document.getElementById('tc-score'),
-            scoreStatus: document.getElementById('tc-score-status'),
-            scoreDescription: document.getElementById('tc-score-description'),
-            recommendationsContent: document.getElementById('tc-recommendations-content'),
-            issues: document.getElementById('tc-issues'),
-            errorMessage: document.getElementById('tc-error'),
-            urlStep: document.getElementById('url-step'),
-            contactStep: document.getElementById('contact-step'),
-            step1: document.getElementById('step-1'),
-            step2: document.getElementById('step-2'),
-            step3: document.getElementById('step-3')
-        };
+    /** Lancer l'analyse */
+    async function handleAnalysis() {
+      const url = elements.urlInput.value.trim();
+      const name = elements.nameInput.value.trim();
+      const email = elements.emailInput.value.trim();
 
-        // Règles de scoring basées exactement sur votre document
-        const rules = [
-            {
-                name: "Absence de Google Tag Manager",
-                regex: /gtm\.js/i,
-                points: -20,
-                invert: true,
-                category: "critical",
-                description: "Aucune gouvernance des balises → site non industrialisé",
-                details: "GTM centralise la gestion de tous vos tags marketing et analytics. Sans GTM, vous perdez en flexibilité et en contrôle sur vos données.",
-                recommendation: "Installer GTM immédiatement"
-            },
-            {
-                name: "GA4 intégré en dur (gtag.js)",
-                regex: /\/gtag\/js\?id=G-/i,
-                points: -10,
-                category: "warning",
-                description: "Balise injectée sans GTM = tracking rigide, peu maintenable",
-                details: "GA4 est installé directement dans le code source au lieu d'être géré via GTM. Cela réduit votre flexibilité.",
-                recommendation: "Migrer GA4 vers GTM"
-            },
-            {
-                name: "Universal Analytics toujours actif",
-                regex: /analytics\.js|UA-[0-9]+/i,
-                points: -15,
-                category: "critical",
-                description: "analytics.js ou UA-XXXXX toujours présent = technologie obsolète",
-                details: "Universal Analytics a cessé de fonctionner en juillet 2023. Vos données ne sont plus collectées.",
-                recommendation: "Migrer vers GA4 - urgence absolue"
-            },
-            {
-                name: "Absence de bandeau ou CMP détectable",
-                regex: /sdk\.privacy-center\.org|sdk\.didomi\.io|scripts\.didomi\.io|api\.didomi\.io|static\.axept\.io|www\.axept\.io|cookie\.sirdata\.com|cmp\.sirdata\.com|cdn\.sirdata\.com|cdn-cookieyes\.com|cdn-cookieyes\.io|app\.cookieyes\.com|cdn\.iubenda\.com|iubenda\.com\/cmp|consent\.iubenda\.com|app\.usercentrics\.eu|consent\.cookiebot\.com|consentcdn\.cookiebot\.com|choice\.quantcast\.com|cmp\.quantcast\.com|consent\.trustarc\.com|cdn\.trustcommander\.net|cdn\.cookielaw\.org|cdn\.cookielaw\.net|cookie-cdn\.onetrust\.com|cmp\.[a-z0-9.-]+|consent\.[a-z0-9.-]+/i,
-                points: -10,
-                invert: true,
-                category: "critical",
-                description: "Pas de axeptio, tarteaucitron, cookiebot... détecté dans le code HTML",
-                details: "Le RGPD impose une gestion stricte des cookies. Sans CMP, vous risquez des amendes importantes.",
-                recommendation: "Installer un CMP conforme RGPD"
-            },
-            {
-                name: "Dépôt de cookies marketing sans consentement",
-                regex: /(?:^|;\s*)(?:_ga\w*|_gid|_gat|gclau|gclaw|gcldc|_fbp|fr|li_fat_id|UserMatchHistory|_ttp|_pinterest_sess|_pin_unauth|personalization_id|guest_id|hubspotutk|hjSessionUser\w+|_hjIncludedInPageviewSample|_uetvid|_uetsid|_calltrk|calltrk_landing|nimbata|sp_id|sp_ses|prism\w+|mkto_trk|visitor_id\d+|ceg\w+|mf\w+|optimizely\w*|ajs\w+)=/i,
-                points: -20,
-                category: "critical",
-                description: "Cookies déposés malgré l'absence d'interaction avec une CMP",
-                details: "Des cookies de tracking sont présents mais aucun système de consentement n'est visible.",
-                recommendation: "Conditionner les cookies au consentement"
-            },
-            {
-                name: "Outils de suivis intégrés en dur",
-                regex: /graph\.facebook\.com|snap\.licdn\.com\/li\.lms-analytics\/insight\.min\.js|px\.ads\.linkedin\.com\/collect|analytics\.tiktok\.com\/i18n\/pixel\/events\.js|business\.tiktok\.com|s\.pinimg\.com\/ct\/lib\/main\.[^/]+\.js|ct\.pinterest\.com\/v3\/|static\.ads-twitter\.com\/uwt\.js|analytics\.twitter\.com\/i\/adsct|js\.hs-scripts\.com|js\.hs-analytics\.com|hs-analytics\.net|hscollectedforms\.net|static\.hotjar\.com\/c\/hotjar-[^/]+\.js|script\.hotjar\.com\/modules\.[^/]+\.js|vars\.hotjar\.com|www\.clarity\.ms\/tag\/|bat\.bing\.com\/bat\.js|cdn\.callrail\.com|t\.calltrk\.com|cdn\.nimbata\.com|track\.nimbata\.com|sp\.analytics\.spotify\.com|spclient\.wg\.spotify\.com|cdn\.segment\.com|script\.crazyegg\.com|cdn\.mouseflow\.com|cdn\.optimizely\.com|munchkin\.marketo\.net|pi\.pardot\.com/i,
-                points: -10,
-                category: "warning",
-                description: "Tracking Facebook hors GTM = difficile à maintenir, non conforme",
-                details: "Les pixels de réseaux sociaux sont chargés directement, rendant difficile leur gestion et conformité.",
-                recommendation: "Centraliser via GTM"
-            },
-            {
-                name: "Server-side tracking non détecté",
-                regex: /https:\/\/(analytics|sst|tracking)\./i,
-                points: -10,
-                invert: true,
-                category: "warning",
-                description: "Pas de server-side détecté (sous-domaine analytics., sst., tracking.)",
-                details: "Le tracking client-side est limité par les bloqueurs de pub et les restrictions navigateurs.",
-                recommendation: "Implémenter le server-side tracking"
-            },
-            {
-                name: "Solution Addingwell détectée",
-                regex: /awl=/i,
-                points: +10,
-                category: "positive",
-                description: "Excellente pratique ! Solution de tracking avancé détectée",
-                details: "Addingwell offre une solution server-side premium pour optimiser la collecte de données.",
-                recommendation: "Continuer sur cette voie"
-            }
-        ];
+      if (!name || !email) {
+        elements.errorMessage.textContent = 'Veuillez remplir tous les champs.';
+        elements.errorMessage.style.display = 'block';
+        return;
+      }
 
-        // Event listeners
-        elements.urlBtn.addEventListener('click', handleUrlStep);
-        elements.button.addEventListener('click', handleAnalysis);
-        elements.backBtn.addEventListener('click', goBackToUrlStep);
+      elements.errorMessage.style.display = 'none';
+      elements.contactStep.style.display = 'none';
+      elements.spinner.style.display = 'block';
+      elements.step2.classList.remove('active');
+      elements.step2.classList.add('completed');
+      elements.step3.classList.add('active');
+      currentStep = 3;
+      console.log('🔎 Début de l’analyse pour :', url);
 
-        elements.urlInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') elements.urlBtn.click();
-        });
+      // Simuler le fetch du HTML de la page à auditer
+      let html = '';
+      try {
+        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+        html = await res.text();
+      } catch (e) {
+        console.error('❌ Erreur de récupération du HTML :', e);
+        elements.errorMessage.textContent = 'Impossible d’analyser ce site.';
+        elements.errorMessage.style.display = 'block';
+        elements.spinner.style.display = 'none';
+        return;
+      }
 
-        elements.nameInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') elements.emailInput.focus();
-        });
+      processAnalysis(html);
+    }
 
-        elements.emailInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') elements.button.click();
-        });
+    /** Processer l'analyse */
+    function processAnalysis(html) {
+      let score = 100;
+      const allIssues = [];
 
-        // Fonction pour basculer les détails
-        window.toggleDetails = function (detailsId) {
-            const details = document.getElementById(detailsId);
-            const isExpanded = details.classList.contains('expanded');
+      rules.forEach((rule, index) => {
+        const matched = rule.regex.test(html);
+        const isIssue = rule.invert ? !matched : matched;
 
-            if (isExpanded) {
-                details.classList.remove('expanded');
-            } else {
-                details.classList.add('expanded');
-            }
-        };
-
-        /** Gérer la transition vers l'étape contact */
-        function handleUrlStep() {
-            const url = elements.urlInput.value.trim();
-            if (!url) {
-                elements.errorMessage.textContent = 'Veuillez entrer une URL valide.';
-                elements.errorMessage.style.display = 'block';
-                return;
-            }
-            elements.errorMessage.style.display = 'none';
-            elements.urlStep.style.display = 'none';
-            elements.contactStep.style.display = 'block';
-            elements.step1.classList.remove('active');
-            elements.step1.classList.add('completed');
-            elements.step2.classList.add('active');
-            currentStep = 2;
-            console.log('➡️ Passage à l’étape 2 : saisie contact');
+        if (isIssue) {
+          score += rule.points;
+          allIssues.push(rule);
+          console.log(`⚠️ Règle déclenchée : ${rule.name}`);
+        } else {
+          console.log(`✅ Conforme : ${rule.name}`);
         }
+      });
 
-        /** Revenir à l’étape URL */
-        function goBackToUrlStep() {
-            elements.contactStep.style.display = 'none';
-            elements.urlStep.style.display = 'block';
-            elements.step2.classList.remove('active');
-            elements.step1.classList.add('active');
-            currentStep = 1;
-            console.log('⬅️ Retour à l’étape 1 : URL');
+      // Clamp score entre 0 et 100
+      score = Math.max(0, Math.min(100, score));
+
+      elements.spinner.style.display = 'none';
+      elements.results.style.display = 'block';
+      displayGauge(score);
+      displayScoreDetails(score, allIssues);
+      displayIssues(allIssues);
+
+      console.log('🎯 Score final :', score);
+      console.log('📊 Nombre d’issues :', allIssues.length);
+    }
+
+    /** Affichage du gauge Chart */
+    function displayGauge(score) {
+      if (typeof Chart === 'undefined') {
+        console.warn('⏳ Chart.js pas encore prêt, retry dans 100ms...');
+        setTimeout(() => displayGauge(score), 100);
+        return;
+      }
+      const ctx = document.getElementById('tc-gauge').getContext('2d');
+      if (gauge) gauge.destroy();
+
+      let color = '#28a745';
+      if (score < 50) color = '#dc3545';
+      else if (score < 75) color = '#fd7e14';
+
+      gauge = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [score, 100 - score],
+            backgroundColor: [color, '#e9ecef'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          cutout: '70%',
+          rotation: -90,
+          circumference: 180,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } }
         }
+      });
 
-        /** Lancer l'analyse */
-        async function handleAnalysis() {
-            const url = elements.urlInput.value.trim();
-            const name = elements.nameInput.value.trim();
-            const email = elements.emailInput.value.trim();
+      elements.score.textContent = score;
+      elements.scoreStatus.textContent =
+        score >= 75 ? 'Bon niveau' :
+          score >= 50 ? 'Moyen - amélioration possible' :
+            'Critique - action urgente';
+    }
 
-            if (!name || !email) {
-                elements.errorMessage.textContent = 'Veuillez remplir tous les champs.';
-                elements.errorMessage.style.display = 'block';
-                return;
-            }
+    /** Affiche la description globale et les recommandations */
+    function displayScoreDetails(score, issues) {
+      elements.scoreDescription.textContent =
+        issues.length === 0
+          ? "Configuration optimale détectée."
+          : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
 
-            elements.errorMessage.style.display = 'none';
-            elements.contactStep.style.display = 'none';
-            elements.spinner.style.display = 'block';
-            elements.step2.classList.remove('active');
-            elements.step2.classList.add('completed');
-            elements.step3.classList.add('active');
-            currentStep = 3;
-            console.log('🔎 Début de l’analyse pour :', url);
+      elements.recommendationsContent.innerHTML = issues
+        .map(i => `• ${i.recommendation}`)
+        .join('<br>');
+    }
 
-            // Simuler le fetch du HTML de la page à auditer
-            let html = '';
-            try {
-                const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-                html = await res.text();
-            } catch (e) {
-                console.error('❌ Erreur de récupération du HTML :', e);
-                elements.errorMessage.textContent = 'Impossible d’analyser ce site.';
-                elements.errorMessage.style.display = 'block';
-                elements.spinner.style.display = 'none';
-                return;
-            }
-
-            processAnalysis(html);
-        }
-
-        /** Processer l'analyse */
-        function processAnalysis(html) {
-            let score = 100;
-            const allIssues = [];
-
-            rules.forEach((rule, index) => {
-                const matched = rule.regex.test(html);
-                const isIssue = rule.invert ? !matched : matched;
-
-                if (isIssue) {
-                    score += rule.points;
-                    allIssues.push(rule);
-                    console.log(`⚠️ Règle déclenchée : ${rule.name}`);
-                } else {
-                    console.log(`✅ Conforme : ${rule.name}`);
-                }
-            });
-
-            // Clamp score entre 0 et 100
-            score = Math.max(0, Math.min(100, score));
-
-            elements.spinner.style.display = 'none';
-            elements.results.style.display = 'block';
-            displayGauge(score);
-            displayScoreDetails(score, allIssues);
-            displayIssues(allIssues);
-
-            console.log('🎯 Score final :', score);
-            console.log('📊 Nombre d’issues :', allIssues.length);
-        }
-
-        /** Affichage du gauge Chart */
-        function displayGauge(score) {
-            const ctx = document.getElementById('tc-gauge').getContext('2d');
-            if (gauge) gauge.destroy();
-
-            let color = '#28a745';
-            if (score < 50) color = '#dc3545';
-            else if (score < 75) color = '#fd7e14';
-
-            gauge = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [score, 100 - score],
-                        backgroundColor: [color, '#e9ecef'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    cutout: '70%',
-                    rotation: -90,
-                    circumference: 180,
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
-                }
-            });
-
-            elements.score.textContent = score;
-            elements.scoreStatus.textContent =
-                score >= 75 ? 'Bon niveau' :
-                    score >= 50 ? 'Moyen - amélioration possible' :
-                        'Critique - action urgente';
-        }
-
-        /** Affiche la description globale et les recommandations */
-        function displayScoreDetails(score, issues) {
-            elements.scoreDescription.textContent =
-                issues.length === 0
-                    ? "Configuration optimale détectée."
-                    : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
-
-            elements.recommendationsContent.innerHTML = issues
-                .map(i => `• ${i.recommendation}`)
-                .join('<br>');
-        }
-
-        /** Affiche les issues avec détails repliables */
-        function displayIssues(issues) {
-            elements.issues.innerHTML = '';
-            if (issues.length === 0) {
-                elements.issues.innerHTML = `<li class="tc-issue" style="border-color:#28a745; border-left-color:#28a745; background:#f0f8f0;">
+    /** Affiche les issues avec détails repliables */
+    function displayIssues(issues) {
+      elements.issues.innerHTML = '';
+      if (issues.length === 0) {
+        elements.issues.innerHTML = `<li class="tc-issue" style="border-color:#28a745; border-left-color:#28a745; background:#f0f8f0;">
           <div class="tc-issue-content">
             <span class="tc-issue-name">✅ Aucune anomalie détectée</span>
             <span class="tc-issue-points" style="background:#28a745;">Parfait</span>
           </div>
         </li>`;
-                return;
-            }
+        return;
+      }
 
-            issues.forEach((issue, idx) => {
-                const li = document.createElement('li');
-                li.className = 'tc-issue tc-issue-expandable';
-                li.style.borderColor = issue.category === 'critical' ? '#dc3545' :
-                    issue.category === 'warning' ? '#fd7e14' :
-                        '#28a745';
-                li.style.borderLeftColor = li.style.borderColor;
-                li.style.background = '#fff';
+      issues.forEach((issue, idx) => {
+        const li = document.createElement('li');
+        li.className = 'tc-issue tc-issue-expandable';
+        li.style.borderColor = issue.category === 'critical' ? '#dc3545' :
+          issue.category === 'warning' ? '#fd7e14' :
+            '#28a745';
+        li.style.borderLeftColor = li.style.borderColor;
+        li.style.background = '#fff';
 
-                const detailsId = `tc-issue-details-${idx}`;
-                li.innerHTML = `
+        const detailsId = `tc-issue-details-${idx}`;
+        li.innerHTML = `
           <div class="tc-issue-content">
             <div class="tc-issue-info">
               <div class="tc-issue-name">
@@ -971,9 +976,9 @@
           <div id="${detailsId}" class="tc-issue-details">${issue.details}</div>
         `;
 
-                elements.issues.appendChild(li);
-            });
-        }
+        elements.issues.appendChild(li);
+      });
+    }
 
-    } // end initializeCalculator
+  } // end initializeCalculator
 })(); 

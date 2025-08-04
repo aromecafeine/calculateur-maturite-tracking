@@ -278,6 +278,7 @@
         background: linear-gradient(135deg, #0056cc 0%, #0077ff 100%);
       }
       
+      
       .tc-button-secondary {
         background: transparent;
         color: #004aad;
@@ -286,6 +287,11 @@
         margin-right: 15px;
         width: auto;
         box-shadow: none;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        border-radius: 16px;
+        cursor:pointer;
+        transition: all 0.3s ease;
       }
       
       .tc-button-secondary:hover:not(:disabled) {
@@ -294,6 +300,7 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0, 74, 173, 0.2);
       }
+
       
       .tc-button:disabled {
         opacity: 0.7;
@@ -567,7 +574,7 @@
               <div class="tc-step" id="step-3">3</div>
             </div>
             <div class="tc-header">
-              <h1>Audit Tracking Gratuit</h1>
+              <h1>Ton tracking tient-il la route ?</h1>
               <p>Découvrez les failles de votre tracking en 60 secondes</p>
             </div>
           </div>
@@ -785,11 +792,15 @@
       const details = document.getElementById(detailsId);
       const isExpanded = details.classList.contains('expanded');
 
+
       if (isExpanded) {
         details.classList.remove('expanded');
+        details.previousElementSibling.querySelector('.tc-toggle-text').textContent = 'voir détails';
       } else {
         details.classList.add('expanded');
+        details.previousElementSibling.querySelector('.tc-toggle-text').textContent = 'masquer';
       }
+
     };
 
     /** Gérer la transition vers l'étape contact */
@@ -892,7 +903,8 @@
     function displayGauge(score) {
       if (typeof Chart === 'undefined') {
         console.warn('⏳ Chart.js pas encore prêt, retry dans 100ms...');
-        setTimeout(() => displayGauge(score), 100);
+        if (!window.chartRetryCount) window.chartRetryCount = 0;
+        if (window.chartRetryCount < 20) { window.chartRetryCount++; setTimeout(() => displayGauge(score), 200); }
         return;
       }
       const ctx = document.getElementById('tc-gauge').getContext('2d');
@@ -965,7 +977,7 @@
           <div class="tc-issue-content">
             <div class="tc-issue-info">
               <div class="tc-issue-name">
-                ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')">[voir détails]</span>
+                ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>voir détails</span></span>
               </div>
               <div class="tc-issue-description">${issue.description}</div>
             </div>

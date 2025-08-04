@@ -3,42 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Calculateur de Maturité Tracking</title>
-  
-  <!-- Google Fonts Poppins -->
+  <title>Audit Tracking Gratuit</title>
+  <!-- Font Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Chart.js (nécessaire pour le gauge) -->
-  <script src="https://aromecafeine.github.io/calculateur-maturite-tracking/chart.js" defer></script>
-  <!-- Votre script métier -->
-  <script src="https://aromecafeine.github.io/calculateur-maturite-tracking/script.js" defer></script>
-</head>
-<body style="margin:0;padding:0;font-family:'Poppins',sans-serif;
-             background:linear-gradient(135deg,#004aad 0%,#336EBF 100%);
-             min-height:100vh;display:flex;align-items:center;justify-content:center;">
-
-  <div style="text-align:center;margin-bottom:30px;padding:20px;">
-    <h1 style="color:white;font-size:2em;margin-bottom:20px;">Ton tracking tient-il la route ?</h1>
-    <p style="color:rgba(255,255,255,0.9);font-size:1.1em;margin-bottom:30px;">Testez votre configuration de tracking web</p>
-    
-    <!-- Conteneur d'injection -->
-    <div id="widget-container"></div>
-    
-    <noscript style="background:#ffe6e6;border:1px solid #ffcccc;border-radius:12px;
-                   padding:20px;color:#cc0000;display:block;margin-top:20px;">
-      ⚠️ Ce widget nécessite JavaScript activé.
-    </noscript>
-  </div>
-
+  <!-- Votre script métier (charge Chart.js en interne via script.js) -->
+  <script src="script.js" defer></script>
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #004aad 0%, #336EBF 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #widget-container {
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 10px !important; }
+      #widget-container { padding: 20px !important; margin: 10px !important; }
+    }
     @keyframes spin {
       0%   { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    @media (max-width: 768px) {
-      body { padding: 10px !important; }
-      #widget-container { padding: 20px !important; margin:10px !important; }
-    }
   </style>
+</head>
+<body>
+  <div id="widget-container"></div>
+  <noscript style="background:#ffe6e6;border:1px solid #ffcccc;border-radius:12px;
+                   padding:20px;color:#cc0000;display:block;margin:20px auto;max-width:800px;text-align:center;">
+    ⚠️ Ce widget nécessite JavaScript activé.
+  </noscript>
 </body>
 </html>

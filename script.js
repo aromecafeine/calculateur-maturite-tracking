@@ -1,13 +1,10 @@
-// script.js
-
 (function(){
-  console.log('🚀 Calculateur Tracking - Initialisation du script');
-  const BASE = 'https://aromecafeine.github.io/calculateur-maturite-tracking/';
+  console.log('🚀 Audit Tracking – Initialisation du script');
 
-  // 1️⃣ Chart.js
+  // 1️⃣ Charger Chart.js (avec fallback CDN)
   if (typeof Chart === 'undefined') {
     const s = document.createElement('script');
-    s.src = BASE + 'chart.js';
+    s.src = 'https://aromecafeine.github.io/calculateur-maturite-tracking/chart.js';
     s.onload = init;
     s.onerror = () => {
       console.error('❌ Erreur Chart.js, fallback CDN');
@@ -21,138 +18,215 @@
     init();
   }
 
-  // 2️⃣ Injection CSS + HTML
+  // 2️⃣ Initialisation de l’UI (HTML + CSS)
   function init(){
-    // --- CSS simplifié, couleurs #004aad & déclinaisons ---
-    const css = ` /* voir version complète plus haut */ `;
+    const container = document.getElementById('widget-container');
+    if (!container) {
+      console.error('❌ widget-container introuvable');
+      return;
+    }
+    // CSS minimal
     const style = document.createElement('style');
-    style.textContent = css;
+    style.textContent = `
+      * { box-sizing:border-box; }
+      #tc-calculator { background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.1); overflow:hidden; }
+      body, button, input { font-family:'Poppins',sans-serif; }
+      .step { display:none; padding:20px; }
+      .step.active { display:block; }
+      button { padding:12px 20px; border:none; border-radius:8px; cursor:pointer; }
+      .btn-primary { background:#004aad; color:#fff; width:100%; }
+      .btn-secondary { background:transparent; color:#004aad; border:2px solid #004aad; }
+      .input-wrapper { position:relative; margin:16px 0; }
+      .input-wrapper::before { content:'🌐'; position:absolute; left:12px; top:50%; transform:translateY(-50%); }
+      .input-wrapper input { width:100%; padding:12px 12px 12px 36px; border:1px solid #ccc; border-radius:6px;}
+      #tc-spinner { display:none; text-align:center; padding:20px; }
+      #tc-spinner .icon { width:40px; height:40px; border:4px solid #eee; border-top:4px solid #004aad; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 12px;}
+      @keyframes spin { to{transform:rotate(360deg);} }
+      .results { text-align:center; }
+      .results ul { list-style:none; padding:0; }
+      .results li { margin:8px 0; text-align:left; }
+      .error { color:#c62828; margin-top:8px; display:none; }
+    `;
     document.head.appendChild(style);
 
-    // --- HTML du widget ---
-    const container = document.getElementById('widget-container');
+    // HTML structure
     container.innerHTML = `
       <div id="tc-calculator">
-        <div class="tc-hero-section">
-          <div class="tc-step-indicator">
-            <div class="tc-step active" id="step-1">1</div>
-            <div class="tc-step" id="step-2">2</div>
-            <div class="tc-step" id="step-3">3</div>
+        <div class="step active" id="step-1">
+          <h2>1. Entrez l’URL de votre site</h2>
+          <div class="input-wrapper">
+            <input id="tc-url" type="url" placeholder="votre-site.com" />
           </div>
-          <div class="tc-header">
-            <h1>Audit Tracking Gratuit</h1>
-            <p>Découvrez les failles de votre tracking en 60 secondes</p>
+          <div class="error" id="err-1"></div>
+          <button id="btn-1" class="btn-primary">Continuer →</button>
+        </div>
+        <div class="step" id="step-2">
+          <h2>2. Vos informations</h2>
+          <div style="display:flex;gap:8px;">
+            <input id="tc-name" type="text" placeholder="Prénom" style="flex:1;border:1px solid #ccc;border-radius:6px;padding:12px;" />
+            <input id="tc-email" type="email" placeholder="Email" style="flex:1;border:1px solid #ccc;border-radius:6px;padding:12px;" />
+          </div>
+          <div class="error" id="err-2"></div>
+          <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+            <button id="back-2" class="btn-secondary">← Retour</button>
+            <button id="btn-2" class="btn-primary">🚀 Lancer mon analyse</button>
           </div>
         </div>
-        <div class="tc-main-content">
-          <!-- STEP 1: URL -->
-          <div class="tc-url-step" id="url-step">
-            <div class="tc-step-title">🌐 Entrez l'URL de votre site</div>
-            <input id="tc-url" class="tc-input tc-url-input" type="url" placeholder="https://votre-site.com" required>
-            <button id="tc-url-btn" class="tc-button">Continuer →</button>
+        <div id="tc-spinner">
+          <div class="icon"></div>
+          <p>Analyse en cours…</p>
+        </div>
+        <div class="step" id="step-3">
+          <h2>3. Résultats</h2>
+          <div class="results">
+            <p>Score global : <strong id="final-score">–</strong>/100</p>
+            <canvas id="tc-gauge" width="150" height="150"></canvas>
+            <ul id="weaknesses"></ul>
           </div>
-
-          <!-- STEP 2: Contact -->
-          <div class="tc-contact-step" id="contact-step">
-            <div class="tc-step-title">👤 Vos infos pour recevoir le rapport</div>
-            <div class="tc-contact-grid">
-              <input id="tc-name" class="tc-input" type="text" placeholder="Votre prénom" required>
-              <input id="tc-email" class="tc-input" type="email" placeholder="Votre email" required>
-            </div>
-            <button id="tc-back-btn" class="tc-button-secondary">← Retour</button>
-            <button id="tc-scan-btn" class="tc-button"><span id="tc-btn-text">🚀 Lancer mon analyse</span></button>
-          </div>
-
-          <!-- Spinner -->
-          <div id="tc-spinner" class="tc-spinner"><div class="tc-spinner-icon"></div><p>Analyse en cours…</p></div>
-
-          <!-- Résultats -->
-          <div id="tc-results" class="tc-results">
-            <!-- (vous pouvez ajouter ici le contenu final, gauge, recommandations…) -->
-            <p style="text-align:center;color:#004aad;font-weight:600;">[Ici vos résultats]</p>
-          </div>
-
-          <!-- Erreur -->
-          <div id="tc-error" class="tc-error"></div>
         </div>
       </div>
     `;
-
-    initializeCalculator();
+    bindEvents();
   }
 
-  // 3️⃣ Logique d'interaction
-  function initializeCalculator() {
-    const elements = {
-      urlStep:     document.getElementById('url-step'),
-      contactStep: document.getElementById('contact-step'),
-      spinner:     document.getElementById('tc-spinner'),
-      results:     document.getElementById('tc-results'),
-      urlBtn:      document.getElementById('tc-url-btn'),
-      backBtn:     document.getElementById('tc-back-btn'),
-      scanBtn:     document.getElementById('tc-scan-btn'),
-      btnText:     document.getElementById('tc-btn-text'),
-      urlInput:    document.getElementById('tc-url'),
-      nameInput:   document.getElementById('tc-name'),
-      emailInput:  document.getElementById('tc-email'),
-      err:         document.getElementById('tc-error'),
-      step1:       document.getElementById('step-1'),
-      step2:       document.getElementById('step-2'),
-      step3:       document.getElementById('step-3'),
-    };
+  // 3️⃣ Liaison des événements & navigation
+  function bindEvents(){
+    const urlIn  = document.getElementById('tc-url');
+    const btn1   = document.getElementById('btn-1');
+    const btn2   = document.getElementById('btn-2');
+    const back2  = document.getElementById('back-2');
+    const err1   = document.getElementById('err-1');
+    const err2   = document.getElementById('err-2');
+    const spinner= document.getElementById('tc-spinner');
+    const step1  = document.getElementById('step-1');
+    const step2  = document.getElementById('step-2');
+    const step3  = document.getElementById('step-3');
 
-    function hideError(){ elements.err.style.display='none'; elements.err.textContent=''; }
-    function showError(msg){ elements.err.style.display='block'; elements.err.textContent=msg; }
+    function showStep(n){
+      [step1, step2, spinner, step3].forEach(el=>el.classList.remove('active'));
+      step1.style.display = 'none'; step2.style.display = 'none'; spinner.style.display = 'none'; step3.style.display = 'none';
+      if(n==='spinner'){
+        spinner.style.display = 'block';
+      } else {
+        const el = n===1?step1:n===2?step2:step3;
+        el.style.display = 'block'; el.classList.add('active');
+      }
+    }
 
-    // → Étape 1 → 2
-    elements.urlBtn.addEventListener('click',()=>{
-      const url = elements.urlInput.value.trim();
-      if(!url){ return showError('URL requise'); }
-      try { new URL(url.startsWith('http')?url:'https://'+url); }
-      catch{ return showError('Format d\'URL incorrect'); }
-      hideError();
-      elements.urlStep.style.display='none';
-      elements.contactStep.style.display='block';
-      elements.step1.classList.replace('active','completed');
-      elements.step2.classList.add('active');
+    btn1.addEventListener('click', ()=>{
+      err1.style.display='none';
+      if(!urlIn.value.trim()){ err1.textContent='URL requise'; err1.style.display='block'; return; }
+      showStep(2);
     });
+    back2.addEventListener('click', ()=> showStep(1));
 
-    // ← Retour 2 → 1
-    elements.backBtn.addEventListener('click',()=>{
-      hideError();
-      elements.contactStep.style.display='none';
-      elements.urlStep.style.display='block';
-      elements.step1.classList.replace('completed','active');
-      elements.step2.classList.remove('active');
+    btn2.addEventListener('click', async ()=>{
+      err2.style.display='none';
+      let url = urlIn.value.trim();
+      if(!url) { err2.textContent='URL requise'; err2.style.display='block'; return; }
+      showStep('spinner');
+
+      // Fetch via AllOrigins pour contourner CORS
+      try {
+        const targetUrl = url.startsWith('http')?url:'https://'+url;
+        const res = await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(targetUrl));
+        const json = await res.json();
+        const html = json.contents.toLowerCase();
+
+        const result = analyzeHTML(html);
+        displayResults(result);
+
+        showStep(3);
+      } catch(e) {
+        console.error(e);
+        err2.textContent = 'Erreur de récupération ou CORS';
+        err2.style.display='block';
+        showStep(2);
+      }
     });
-
-    // → Analyse 2 → 3
-    elements.scanBtn.addEventListener('click', ()=>{
-      hideError();
-      goToResultsStep();
-    });
-
-    // Entrées clavier
-    elements.urlInput.addEventListener('keypress', e=>{ if(e.key==='Enter') elements.urlBtn.click(); });
-    elements.nameInput.addEventListener('keypress', e=>{ if(e.key==='Enter') elements.emailInput.focus(); });
-    elements.emailInput.addEventListener('keypress', e=>{ if(e.key==='Enter') elements.scanBtn.click(); });
   }
 
-  // 4️⃣ Simulation de l’analyse
-  function goToResultsStep(){
-    const e = document.querySelector.bind(document);
-    e('#url-step').style.display     = 'none';
-    e('#contact-step').style.display = 'none';
-    e('#tc-spinner').style.display   = 'block';
-    document.getElementById('step-2').classList.replace('active','completed');
-    document.getElementById('step-3').classList.add('active');
+  // 4️⃣ Règles d’audit
+  const RULES = [
+    { name:'Absence de GTM', regex:/gtm\.js/i, points:-20, description:'GTM non détecté (–20)' },
+    { name:'GA4 direct', regex:/gtag\/js\?id=G-/i, points:-10, description:'GA4 en dur sans GTM (–10)' },
+    { name:'UA obsolète', regex:/analytics\.js|UA-\d+/i, points:-15, description:'UA détecté (–15)' },
+    { name:'CMP manquant', regex:new RegExp([
+        'sdk\.privacy-center\.org','sdk\.didomi\.io','scripts\.didomi\.io','api\.didomi\.io',
+        'static\.axept\.io','www\.axept\.io','cookie\.sirdata\.com','cmp\.sirdata\.com',
+        'cdn\.sirdata\.com','cdn-cookieyes\.com','cdn-cookieyes\.io','app\.cookieyes\.com',
+        'cdn\.iubenda\.com','iubenda\.com/cmp','consent\.iubenda\.com','app\.usercentrics\.eu',
+        'consent\.cookiebot\.com','consentcdn\.cookiebot\.com','choice\.quantcast\.com',
+        'cmp\.quantcast\.com','consent\.trustarc\.com','cdn\.trustcommander\.net',
+        'cdn\.cookielaw\.org','cdn\.cookielaw\.net','cookie-cdn\.onetrust\.com',
+        'cmp\.[a-z0-9.-]+','consent\.[a-z0-9.-]+'
+      ].join('|'), 'i'),
+      points:-10, description:'Aucun CMP détecté (–10)'
+    },
+    { name:'Cookies sans consent.', regex:/(?:^|;\s*)(?:_ga\w*|_gid|_gat|gclau|gclaw|gcldc|_fbp|fr|li_fat_id|UserMatchHistory|_ttp|_pinterest_sess|_pin_unauth|personalization_id|guest_id|hubspotutk|hjSessionUser\w+|_hjIncludedInPageviewSample|_uetvid|_uetsid|_calltrk|calltrk_landing|nimbata|sp_id|sp_ses|prism\w+|mkto_trk|visitor_id\d+|ceg\w+|mf\w+|optimizely\w*|ajs\w+)=/, points:-20, description:'Cookies marketing sans consentement (–20)' },
+    { name:'Pixels externes', regex:/graph\.facebook\.com|snap\.licdn\.com\/li\.lms-analytics\/insight\.min\.js|px\.ads\.linkedin\.com\/collect|analytics\.tiktok\.com\/i18n\/pixel\/events\.js|business\.tiktok\.com|s\.pinimg\.com\/ct\/lib\/main\.[^/]+\.js|ct\.pinterest\.com\/v3\/|static\.ads-twitter\.com\/uwt\.js|analytics\.twitter\.com\/i\/adsct|js\.hs-scripts\.com|js\.hs-analytics\.com|hs-analytics\.net|hscollectedforms\.net|static\.hotjar\.com\/c\/hotjar-[^/]+\.js|script\.hotjar\.com\/modules\.[^/]+\.js|vars\.hotjar\.com|www\.clarity\.ms\/tag\/|bat\.bing\.com\/bat\.js|cdn\.callrail\.com|t\.calltrk\.com|cdn\.nimbata\.com|track\.nimbata\.com|sp\.analytics\.spotify\.com|spclient\.wg\.spotify\.com|cdn\.segment\.com|script\.crazyegg\.com|cdn\.mouseflow\.com|cdn\.optimizely\.com|munchkin\.marketo\.net|pi\.pardot\.com/, points:-10, description:'Outils tiers en dur (–10)' },
+    { name:'Double balisage', regex:null, points:-5, description:'Scripts dupliqués (–5)', special:'duplicate' },
+    { name:'Server-side absent', regex:/https:\/\/(analytics|sst|tracking)\./i, points:-10, invert:true, description:'Server-side absent (–10)' },
+    { name:'Addingwell bonus', regex:/awl=/i, points:+10, description:'Addingwell détecté (+10)' }
+  ];
 
-    // Simule 1 s de traitement, puis affiche les résultats
-    setTimeout(()=>{
-      e('#tc-spinner').style.display = 'none';
-      e('#tc-results').style.display = 'block';
-      document.getElementById('step-3').classList.replace('active','completed');
-    }, 1000);
+  // 5️⃣ Analyse et scoring
+  function analyzeHTML(html){
+    let score = 100;
+    const failures = [];
+    // Appliquer chaque règle
+    RULES.forEach(rule => {
+      let match = false;
+      if(rule.special==='duplicate'){
+        // compter occurrences de GTM
+        const cnt = (html.match(/gtm\.js/gi)||[]).length;
+        if(cnt>1) match = true;
+      } else {
+        match = rule.regex.test(html);
+        if(rule.invert) match = !match;
+      }
+      if(match){
+        score += rule.points;
+        if(rule.points<0) failures.push(rule);
+      }
+    });
+    score = Math.max(0, Math.min(100, score));
+    // garder 2-3 pires failles
+    failures.sort((a,b)=>a.points - b.points);
+    return { score, failures: failures.slice(0,3) };
   }
+
+  // 6️⃣ Affichage des résultats
+  function displayResults({score, failures}){
+    document.getElementById('final-score').textContent = score;
+    createGauge(score);
+    const ul = document.getElementById('weaknesses');
+    ul.innerHTML = '';
+    if(failures.length===0){
+      ul.innerHTML = '<li>✅ Configuration optimale détectée !</li>';
+    } else {
+      failures.forEach(f=>{
+        ul.innerHTML += `<li><strong>${f.name}</strong> : ${f.description}</li>`;
+      });
+    }
+  }
+
+  // 7️⃣ Création du gauge
+  function createGauge(score){
+    const ctx = document.getElementById('tc-gauge').getContext('2d');
+    if(window.gauge) window.gauge.destroy();
+    const color = score>=75?'#28a745':score>=50?'#fd7e14':'#dc3545';
+    window.gauge = new Chart(ctx, {
+      type:'doughnut',
+      data:{datasets:[{data:[score,100-score],backgroundColor:[color,'#e0e0e0'],cutout:'70%'}]},
+      options:{plugins:{tooltip:{enabled:false},legend:{display:false}},responsive:true}
+    });
+  }
+
+  // 8️⃣ Démarrage
+  document.addEventListener('DOMContentLoaded', function(){
+    init();
+    showStep(1);
+  });
 
 })();

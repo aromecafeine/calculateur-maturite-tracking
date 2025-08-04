@@ -970,5 +970,4 @@
     });
   }
 
-} // end initializeCalculator
-}) ();
+})();

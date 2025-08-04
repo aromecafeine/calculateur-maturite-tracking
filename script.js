@@ -1,4 +1,8 @@
 (function () {
+  let elements;
+  let gauge;
+  let currentStep;
+
   console.log('🚀 Calculateur Tracking - Initialisation du script');
 
   // Chargement de Chart.js si pas déjà chargé
@@ -666,9 +670,9 @@
     console.log('⚙️ Initialisation du calculateur');
 
     // Variables globales
-    let gauge = null;
-    let currentStep = 1;
-    const elements = {
+    gauge = null;
+    currentStep = 1;
+    elements = {
       spinner: document.getElementById('tc-spinner'),
       button: document.getElementById('tc-scan-btn'),
       buttonText: document.getElementById('tc-btn-text'),

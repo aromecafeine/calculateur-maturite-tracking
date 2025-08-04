@@ -1,3 +1,4 @@
+
 (function(){
   console.log('🚀 Audit Tracking – Initialisation du script');
 
@@ -226,7 +227,5 @@
   // 8️⃣ Démarrage
   document.addEventListener('DOMContentLoaded', function(){
     init();
-    showStep(1);
-  });
-
+});
 })();

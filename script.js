@@ -913,67 +913,7 @@
         }
         return;
       }
-
-      const ctx = document.getElementById('tc-gauge').getContext('2d');
-      if (gauge) gauge.destroy();
-
-      let color = '#28a745';
-      if (score < 50) color = '#dc3545';
-      else if (score < 75) color = '#fd7e14';
-
-      gauge = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [score, 100 - score],
-            backgroundColor: [color, '#e9ecef'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          cutout: '70%',
-          rotation: -90,
-          circumference: 180,
-          plugins: { legend: { display: false }, tooltip: { enabled: false } }
-        }
-      });
-
-      elements.score.textContent = score;
-      elements.scoreStatus.textContent =
-        score >= 75 ? 'Bon niveau' :
-          score >= 50 ? 'Moyen - amélioration possible' :
-            'Critique - action urgente';
     }
-
-    const ctx = document.getElementById('tc-gauge').getContext('2d');
-    if (gauge) gauge.destroy();
-
-    let color = '#28a745';
-    if (score < 50) color = '#dc3545';
-    else if (score < 75) color = '#fd7e14';
-
-    gauge = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [score, 100 - score],
-          backgroundColor: [color, '#e9ecef'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        cutout: '70%',
-        rotation: -90,
-        circumference: 180,
-        plugins: { legend: { display: false }, tooltip: { enabled: false } }
-      }
-    });
-
-    elements.score.textContent = score;
-    elements.scoreStatus.textContent =
-      score >= 75 ? 'Bon niveau' :
-        score >= 50 ? 'Moyen - amélioration possible' :
-          'Critique - action urgente';
   }
 
   /** Affiche la description globale et les recommandations */
@@ -1031,4 +971,4 @@
   }
 
 } // end initializeCalculator
-}) (); 
+}) ();

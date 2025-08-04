@@ -1,4 +1,26 @@
-;(function(){
+function createGauge(score) {
+      if (gauge) gauge.destroy();
+
+      const ctx = document.getElementById('tc-gauge').getContext('2d');
+      
+      // Couleur basée sur le score - nouveau système
+      let gaugeColor;
+      if (score >= 75) {
+        gaugeColor = '#28a745'; // Vert
+      } else if (score >= 50) {
+        gaugeColor = '#fd7e14'; // Orange
+      } else {
+        gaugeColor = '#dc3545'; // Rouge
+      }
+
+      gauge = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [score, 100 - score],
+            backgroundColor: [gaugeColor, '#e0e0e0'],
+            borderWidth: 0,
+            cut;(function(){
   console.log('🚀 Calculateur Tracking - Initialisation du script');
   
   const BASE = 'https://aromecafeine.github.io/calculateur-maturite-tracking/';
@@ -36,12 +58,13 @@
         backdrop-filter: blur(10px);
         border-radius: 20px;
         padding: 40px;
-        max-width: 600px;
+        max-width: 700px;
         width: 100%;
         box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         border: 1px solid rgba(255,255,255,0.2);
         margin: 20px auto;
-        color: #505942;
+        color: #333;
+        text-align: left;
       }
       
       #tc-calculator * {
@@ -54,16 +77,18 @@
       }
       
       .tc-header h1 {
-        color: #505942;
+        color: #004aad;
         font-size: 2.2em;
         font-weight: 700;
         margin: 0 0 10px 0;
+        text-align: center;
       }
       
       .tc-header p {
         color: #666;
         font-size: 1em;
         margin: 0;
+        text-align: center;
       }
       
       .tc-contact-form {
@@ -95,9 +120,9 @@
       
       .tc-input:focus {
         outline: none;
-        border-color: #d99152;
+        border-color: #004aad;
         background: white;
-        box-shadow: 0 0 0 3px rgba(217,145,82,0.1);
+        box-shadow: 0 0 0 3px rgba(0,74,173,0.1);
       }
       
       .tc-input-url {
@@ -105,7 +130,7 @@
       }
       
       .tc-button {
-        background: linear-gradient(135deg, #d99152 0%, #c8824a 100%);
+        background: linear-gradient(135deg, #004aad 0%, #0056cc 100%);
         color: white;
         border: none;
         padding: 15px 30px;
@@ -119,7 +144,7 @@
       
       .tc-button:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(217,145,82,0.3);
+        box-shadow: 0 10px 20px rgba(0,74,173,0.3);
       }
       
       .tc-button:disabled {
@@ -138,7 +163,7 @@
         width: 40px;
         height: 40px;
         border: 4px solid #f3f3f3;
-        border-top: 4px solid #d99152;
+        border-top: 4px solid #004aad;
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin: 0 auto 15px;
@@ -180,7 +205,7 @@
       .tc-gauge-score-value {
         font-size: 2em;
         font-weight: 700;
-        color: #505942;
+        color: #004aad;
         margin: 0;
       }
       
@@ -198,7 +223,7 @@
         font-size: 1.3em;
         font-weight: 600;
         margin-bottom: 10px;
-        color: #d99152;
+        color: #004aad;
       }
       
       .tc-score-description {
@@ -208,15 +233,15 @@
       }
       
       .tc-recommendations {
-        background: #f8f9fa;
-        border-left: 4px solid #d99152;
+        background: #f8f9ff;
+        border-left: 4px solid #004aad;
         padding: 15px;
         border-radius: 8px;
       }
       
       .tc-recommendations-title {
         font-weight: 600;
-        color: #505942;
+        color: #004aad;
         margin-bottom: 8px;
       }
       
@@ -233,7 +258,7 @@
       .tc-issues-title {
         font-size: 1.2em;
         font-weight: 600;
-        color: #505942;
+        color: #004aad;
         margin-bottom: 20px;
         display: flex;
         align-items: center;
@@ -280,6 +305,52 @@
         border-radius: 20px;
         font-size: 0.85em;
         font-weight: 600;
+      }
+      
+      .tc-issue-expandable {
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .tc-issue-expandable:hover {
+        background-color: rgba(0,74,173,0.05);
+      }
+      
+      .tc-issue-details {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #e0e0e0;
+        display: none;
+        font-size: 0.9em;
+        color: #666;
+        line-height: 1.5;
+      }
+      
+      .tc-issue-details.expanded {
+        display: block;
+      }
+      
+      .tc-issue-toggle {
+        color: #004aad;
+        font-size: 0.8em;
+        margin-left: 10px;
+        font-weight: 500;
+      }
+      
+      .tc-recommendation-link {
+        display: inline-block;
+        background: #004aad;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75em;
+        text-decoration: none;
+        margin-left: 8px;
+        cursor: pointer;
+      }
+      
+      .tc-recommendation-link:hover {
+        background: #0056cc;
       }
       
       .tc-error {
@@ -416,58 +487,82 @@
         points: -20, 
         invert: true,
         category: "critical",
-        description: "Google Tag Manager n'est pas installé"
+        description: "Google Tag Manager n'est pas installé",
+        details: "GTM centralise la gestion de tous vos tags marketing et analytics. Sans GTM, vous perdez en flexibilité et en contrôle sur vos données.",
+        recommendation: "Installer GTM immédiatement",
+        solution: "Créez un compte GTM, récupérez votre code conteneur et intégrez-le dans votre site."
       },
       { 
         name: "GA4 en dur", 
         regex: /gtag\/js\?id=G-/i, 
         points: -10,
         category: "warning",
-        description: "Google Analytics 4 installé directement (pas via GTM)"
+        description: "Google Analytics 4 installé directement (pas via GTM)",
+        details: "GA4 est installé directement dans le code source au lieu d'être géré via GTM. Cela réduit votre flexibilité.",
+        recommendation: "Migrer GA4 vers GTM",
+        solution: "Supprimez le code GA4 direct et configurez-le comme tag dans GTM."
       },
       { 
         name: "Universal Analytics obsolète", 
         regex: /analytics\.js|UA-\d+/i, 
         points: -15,
         category: "critical",
-        description: "Ancienne version d'Analytics détectée"
+        description: "Ancienne version d'Analytics détectée",
+        details: "Universal Analytics a cessé de fonctionner en juillet 2023. Vos données ne sont plus collectées.",
+        recommendation: "Migrer vers GA4 urgence absolue",
+        solution: "Créez une propriété GA4 et remplacez complètement le code UA."
       },
       { 
         name: "CMP manquant", 
-        regex: /axeptio|tarteaucitron|cookiebot|onetrust|didomi|iubenda/i, 
+        regex: /axeptio|tarteaucitron|cookiebot|onetrust|didomi|iubenda|consent/i, 
         points: -15, 
         invert: true,
         category: "critical",
-        description: "Aucune solution de gestion des cookies détectée"
+        description: "Aucune solution de gestion des cookies détectée",
+        details: "Le RGPD impose une gestion stricte des cookies. Sans CMP, vous risquez des amendes importantes.",
+        recommendation: "Installer un CMP conforme RGPD",
+        solution: "Implémentez Axeptio, Cookiebot ou une solution similaire pour gérer les consentements."
       },
       { 
         name: "Cookies marketing non conformes", 
         regex: /_ga|_gid|_fbp|gcl_|hubspotutk/i, 
         points: -10,
         category: "warning",
-        description: "Cookies marketing détectés sans consentement"
+        description: "Cookies marketing détectés sans consentement apparent",
+        details: "Des cookies de tracking sont présents mais aucun système de consentement n'est visible.",
+        recommendation: "Conditionner les cookies au consentement",
+        solution: "Utilisez GTM avec des triggers de consentement pour ne charger les cookies qu'après accord."
       },
       { 
         name: "Tracking tiers en dur", 
         regex: /facebook\.net|tiktok\.com|linkedin\.com|hotjar\.com/i, 
         points: -8,
         category: "warning",
-        description: "Scripts de tracking externes chargés directement"
+        description: "Scripts de tracking externes chargés directement",
+        details: "Les pixels de réseaux sociaux sont chargés directement, rendant difficile leur gestion et conformité.",
+        recommendation: "Centraliser via GTM",
+        solution: "Déplacez tous les pixels (Facebook, LinkedIn, etc.) dans GTM pour une meilleure gestion."
       },
       { 
         name: "Server-side manquant", 
-        regex: /server-side|sst\.|tracking\./i, 
+        regex: /server-side|sst\.|tracking\.|gtm-msr/i, 
         points: -12, 
         invert: true,
         category: "warning",
-        description: "Pas de tracking server-side détecté"
+        description: "Pas de tracking server-side détecté",
+        details: "Le tracking client-side est limité par les bloqueurs de pub et les restrictions navigateurs.",
+        recommendation: "Implémenter le server-side tracking",
+        solution: "Configurez GTM Server-side ou une solution comme Stape.io pour améliorer la qualité des données."
       },
       { 
         name: "Solution avancée détectée", 
-        regex: /addingwell|stape\.io/i, 
+        regex: /addingwell|stape\.io|gtm-server/i, 
         points: +15,
         category: "positive",
-        description: "Solution de tracking avancé détectée"
+        description: "Solution de tracking avancé détectée",
+        details: "Excellente pratique ! Vous utilisez des solutions avancées pour optimiser votre tracking.",
+        recommendation: "Continuer sur cette voie",
+        solution: "Maintenez et optimisez votre configuration actuelle."
       }
     ];
 
@@ -544,18 +639,26 @@
 
     function analyzeHTML(html, url) {
       console.log('🔬 Analyse du HTML en cours...');
+      console.log('📄 Contenu analysé:', { url, htmlLength: html.length });
       
       let score = 100;
       let issues = [];
       let positivePoints = [];
       let detectedElements = {};
+      let technicalFindings = {};
 
       // Application des règles
       rules.forEach(rule => {
         const match = rule.regex.test(html);
         const shouldApply = rule.invert ? !match : match;
         
-        console.log(`🔍 Règle "${rule.name}":`, { match, shouldApply, points: rule.points });
+        console.log(`🔍 Règle "${rule.name}":`, { 
+          regex: rule.regex.toString(), 
+          match, 
+          shouldApply, 
+          points: rule.points,
+          category: rule.category
+        });
         
         if (shouldApply) {
           score += rule.points;
@@ -568,39 +671,67 @@
           
           detectedElements[rule.name] = true;
         }
+
+        // Collecte des éléments techniques détectés
+        if (match) {
+          const matches = html.match(new RegExp(rule.regex.source, 'gi'));
+          technicalFindings[rule.name] = {
+            detected: match,
+            count: matches ? matches.length : 0,
+            samples: matches ? matches.slice(0, 3) : []
+          };
+        }
       });
 
-      // Détection de doublons
-      const gtmMatches = (html.match(/gtm\.js/gi) || []).length;
-      const gaMatches = (html.match(/gtag\/js/gi) || []).length;
+      // Détection de doublons avec détails
+      const gtmMatches = html.match(/gtm\.js/gi) || [];
+      const gaMatches = html.match(/gtag\/js/gi) || [];
+      const fbMatches = html.match(/fbevents\.js/gi) || [];
       
-      if (gtmMatches > 1 || gaMatches > 1) {
-        console.log('⚠️ Doublons détectés:', { gtmMatches, gaMatches });
+      console.log('🔍 Analyse des doublons:', {
+        gtmCount: gtmMatches.length,
+        gaCount: gaMatches.length,
+        fbCount: fbMatches.length,
+        gtmSamples: gtmMatches.slice(0, 2),
+        gaSamples: gaMatches.slice(0, 2)
+      });
+      
+      if (gtmMatches.length > 1 || gaMatches.length > 1 || fbMatches.length > 1) {
         score -= 5;
         issues.push({
           name: "Scripts dupliqués",
           points: -5,
           category: "warning",
-          description: "Plusieurs instances du même script détectées"
+          description: "Plusieurs instances du même script détectées",
+          details: `GTM: ${gtmMatches.length} instances, GA: ${gaMatches.length} instances, FB: ${fbMatches.length} instances. Cela peut causer des conflits et des données dupliquées.`,
+          recommendation: "Supprimer les doublons",
+          solution: "Gardez une seule instance de chaque script, de préférence gérée via GTM."
         });
       }
+
+      // Analyse des cookies présents
+      const cookieMatches = html.match(/_ga[^=]*=|_gid[^=]*=|_fbp[^=]*=|gcl_[^=]*=/gi) || [];
+      console.log('🍪 Cookies détectés:', cookieMatches);
 
       // Score final
       score = Math.max(0, Math.min(100, score));
       console.log('🎯 Score final calculé:', score);
+      console.log('📊 Résumé technique:', technicalFindings);
 
       return {
         score,
         issues: issues.sort((a, b) => a.points - b.points),
         positivePoints: positivePoints.sort((a, b) => b.points - a.points),
         detectedElements,
+        technicalFindings,
         url
       };
     }
 
     function displayResults(data, userName) {
       console.log('📱 Affichage des résultats');
-      const { score, issues, positivePoints } = data;
+      console.log('🔍 Données complètes de l\'analyse:', data);
+      const { score, issues, positivePoints, technicalFindings } = data;
 
       // Mise à jour du score
       elements.score.textContent = score;
@@ -610,41 +741,40 @@
       createGauge(score);
 
       // Affichage des issues et points positifs
-      displayIssues([...positivePoints, ...issues]);
+      displayIssues([...positivePoints, ...issues], technicalFindings);
 
-      // Recommandations
+      // Recommandations liées
       updateRecommendations(score, issues, positivePoints);
 
       // Montrer les résultats
       elements.results.style.display = 'block';
       
       console.log('✅ Résultats affichés avec succès');
+      console.log('📈 Analyse terminée - Score:', score, 'Issues:', issues.length, 'Points positifs:', positivePoints.length);
     }
 
     function updateScoreStatus(score, userName) {
       let status, description, color;
 
-      if (score >= 85) {
+      if (score >= 75) {
         status = "🏆 Excellent";
         description = `Félicitations ${userName} ! Votre configuration tracking est optimale.`;
-        color = "#2ed573";
-      } else if (score >= 70) {
-        status = "✅ Bon niveau";
-        description = `Bien joué ${userName} ! Configuration correcte avec quelques améliorations possibles.`;
-        color = "#d99152";
+        color = "#28a745";
       } else if (score >= 50) {
         status = "⚠️ À améliorer";
-        description = `${userName}, plusieurs problèmes critiques ont été détectés sur votre site.`;
-        color = "#ff6b35";
+        description = `${userName}, votre configuration nécessite des améliorations importantes.`;
+        color = "#fd7e14";
       } else {
         status = "🚨 Critique";
-        description = `${userName}, une refonte complète de votre tracking est recommandée.`;
-        color = "#ff4757";
+        description = `${userName}, une refonte complète de votre tracking est nécessaire.`;
+        color = "#dc3545";
       }
 
       elements.scoreStatus.textContent = status;
       elements.scoreStatus.style.color = color;
       elements.scoreDescription.textContent = description;
+      
+      console.log('📊 Statut du score mis à jour:', { score, status, color });
     }
 
     function createGauge(score) {

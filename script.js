@@ -722,7 +722,7 @@
             {
                 name: "Absence de Google Tag Manager",
                 regex: /gtm\.js/i,
-                points: -20,
+                points: -30,
                 invert: true,
                 category: "critical",
                 description: "Aucune gouvernance des balises → site non industrialisé",
@@ -732,7 +732,7 @@
             {
                 name: "GA4 intégré en dur (gtag.js)",
                 regex: /\/gtag\/js\?id=G-/i,
-                points: -10,
+                points: -15,
                 category: "warning",
                 description: "Balise injectée sans GTM = tracking rigide, peu maintenable",
                 details: "GA4 est installé directement dans le code source au lieu d'être géré via GTM. Cela réduit votre flexibilité.",
@@ -741,7 +741,7 @@
             {
                 name: "Universal Analytics toujours actif",
                 regex: /analytics\.js|UA-[0-9]+/i,
-                points: -15,
+                points: -5,
                 category: "critical",
                 description: "analytics.js ou UA-XXXXX toujours présent = technologie obsolète",
                 details: "Universal Analytics a cessé de fonctionner en juillet 2023. Vos données ne sont plus collectées.",
@@ -750,7 +750,7 @@
             {
                 name: "Absence de bandeau ou CMP détectable",
                 regex: /sdk\.privacy-center\.org|sdk\.didomi\.io|scripts\.didomi\.io|api\.didomi\.io|static\.axept\.io|www\.axept\.io|cookie\.sirdata\.com|cmp\.sirdata\.com|cdn\.sirdata\.com|cdn-cookieyes\.com|cdn-cookieyes\.io|app\.cookieyes\.com|cdn\.iubenda\.com|iubenda\.com\/cmp|consent\.iubenda\.com|app\.usercentrics\.eu|consent\.cookiebot\.com|consentcdn\.cookiebot\.com|choice\.quantcast\.com|cmp\.quantcast\.com|consent\.trustarc\.com|cdn\.trustcommander\.net|cdn\.cookielaw\.org|cdn\.cookielaw\.net|cookie-cdn\.onetrust\.com|cmp\.[a-z0-9.-]+|consent\.[a-z0-9.-]+/i,
-                points: -10,
+                points: -15,
                 invert: true,
                 category: "critical",
                 description: "Pas de axeptio, tarteaucitron, cookiebot... détecté dans le code HTML",
@@ -758,18 +758,9 @@
                 recommendation: "Installer un CMP conforme RGPD"
             },
             {
-                name: "Dépôt de cookies marketing sans consentement",
-                regex: /(?:^|;\s*)(?:_ga\w*|_gid|_gat|gclau|gclaw|gcldc|_fbp|fr|li_fat_id|UserMatchHistory|_ttp|_pinterest_sess|_pin_unauth|personalization_id|guest_id|hubspotutk|hjSessionUser\w+|_hjIncludedInPageviewSample|_uetvid|_uetsid|_calltrk|calltrk_landing|nimbata|sp_id|sp_ses|prism\w+|mkto_trk|visitor_id\d+|ceg\w+|mf\w+|optimizely\w*|ajs\w+)=/i,
-                points: -20,
-                category: "critical",
-                description: "Cookies déposés malgré l'absence d'interaction avec une CMP",
-                details: "Des cookies de tracking sont présents mais aucun système de consentement n'est visible.",
-                recommendation: "Conditionner les cookies au consentement"
-            },
-            {
                 name: "Outils de suivis intégrés en dur",
                 regex: /(snap\.licdn\.com|px\.ads\.linkedin\.com|analytics\.tiktok\.com|business\.tiktok\.com|s\.pinimg\.com|ct\.pinterest\.com|static\.ads-twitter\.com|analytics\.twitter\.com|js\.hs-scripts\.com|js\.hs-analytics\.com|static\.hotjar\.com|script\.hotjar\.com|vars\.hotjar\.com|www\.clarity\.ms|bat\.bing\.com|cdn\.callrail\.com|t\.calltrk\.com|cdn\.nimbata\.com|track\.nimbata\.com|sp\.analytics\.spotify\.com|spclient\.wg\.spotify\.com|cdn\.segment\.com|script\.crazyegg\.com|munchkin\.marketo\.net|pi\.pardot\.com)/,
-                points: -10,
+                points: -25,
                 category: "warning",
                 description: "Intégration de l'outil X en dur non centralisé dans GTM", // Sera remplacé dynamiquement
                 details: "Les pixels de réseaux sociaux sont chargés directement, rendant difficile leur gestion et conformité.",
@@ -805,7 +796,7 @@
             },
             {
                 name: "Server-side tracking non détecté",
-                regex: /https:\/\/(analytics|sst|tracking)\./i,
+                regex: /(analytics|sst|tracking)\.[a-zA-Z0-9.-]+/i,
                 points: -10,
                 invert: true,
                 category: "warning",
@@ -815,8 +806,8 @@
             },
             {
                 name: "Solution Addingwell détectée",
-                regex: /awl=/i,
-                points: +10,
+                regex: /\.js\?aw='\+i\.replace\(\/\^GTM-\/, ''\)/i,
+                points: +5,
                 category: "positive",
                 description: "Excellente pratique ! Solution de tracking avancé détectée",
                 details: "Addingwell offre une solution server-side premium pour optimiser la collecte de données.",

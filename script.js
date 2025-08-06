@@ -917,61 +917,114 @@
         }
         return;
       }
+
+      // Détruire le graphique existant s'il y en a un
+      if (gauge) {
+        gauge.destroy();
+      }
+
+      // Mettre à jour le score affiché
+      elements.score.textContent = score;
+
+      // Déterminer la couleur en fonction du score
+      let color;
+      let status;
+      if (score >= 80) {
+        color = '#28a745'; // Vert
+        status = 'Excellent niveau';
+      } else if (score >= 60) {
+        color = '#fd7e14'; // Orange
+        status = 'Bon niveau';
+      } else {
+        color = '#dc3545'; // Rouge
+        status = 'Niveau critique';
+      }
+
+      elements.scoreStatus.textContent = status;
+
+      // Configuration du graphique en donut pour simuler une gauge
+      const ctx = document.getElementById('tc-gauge').getContext('2d');
+      gauge = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [score, 100 - score],
+            backgroundColor: [color, '#e9ecef'],
+            borderWidth: 0,
+            cutout: '70%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          rotation: -90, // Commence en haut
+          circumference: 180, // Demi-cercle
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              enabled: false
+            }
+          }
+        }
+      });
     }
-  }
 
-  /** Affiche la description globale et les recommandations */
-  function displayScoreDetails(score, issues) {
-    elements.scoreDescription.textContent =
-      issues.length === 0
-        ? "Configuration optimale détectée."
-        : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
+    /** Affiche la description globale et les recommandations */
+    function displayScoreDetails(score, issues) {
+      elements.scoreDescription.textContent =
+        issues.length === 0
+          ? "Configuration optimale détectée."
+          : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
 
-    elements.recommendationsContent.innerHTML = issues
-      .map(i => `• ${i.recommendation}`)
-      .join('<br>');
-  }
-
-  /** Affiche les issues avec détails repliables */
-  function displayIssues(issues) {
-    elements.issues.innerHTML = '';
-    if (issues.length === 0) {
-      elements.issues.innerHTML = `<li class="tc-issue" style="border-color:#28a745; border-left-color:#28a745; background:#f0f8f0;">
-          <div class="tc-issue-content">
-            <span class="tc-issue-name">✅ Aucune anomalie détectée</span>
-            <span class="tc-issue-points" style="background:#28a745;">Parfait</span>
-          </div>
-        </li>`;
-      return;
+      elements.recommendationsContent.innerHTML = issues
+        .map(i => `• ${i.recommendation}`)
+        .join('<br>');
     }
 
-    issues.forEach((issue, idx) => {
-      const li = document.createElement('li');
-      li.className = 'tc-issue tc-issue-expandable';
-      li.style.borderColor = issue.category === 'critical' ? '#dc3545' :
-        issue.category === 'warning' ? '#fd7e14' :
-          '#28a745';
-      li.style.borderLeftColor = li.style.borderColor;
-      li.style.background = '#fff';
-
-      const detailsId = `tc-issue-details-${idx}`;
-      li.innerHTML = `
-          <div class="tc-issue-content">
-            <div class="tc-issue-info">
-              <div class="tc-issue-name">
-                ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>voir détails</span></span>
-              </div>
-              <div class="tc-issue-description">${issue.description}</div>
+    /** Affiche les issues avec détails repliables */
+    function displayIssues(issues) {
+      elements.issues.innerHTML = '';
+      if (issues.length === 0) {
+        elements.issues.innerHTML = `<li class="tc-issue" style="border-color:#28a745; border-left-color:#28a745; background:#f0f8f0;">
+            <div class="tc-issue-content">
+              <span class="tc-issue-name">✅ Aucune anomalie détectée</span>
+              <span class="tc-issue-points" style="background:#28a745;">Parfait</span>
             </div>
-            <span class="tc-issue-points" style="background:${li.style.borderColor};">
-              ${issue.points} pts
-            </span>
-          </div>
-          <div id="${detailsId}" class="tc-issue-details">${issue.details}</div>
-        `;
+          </li>`;
+        return;
+      }
 
-      elements.issues.appendChild(li);
-    });
+      issues.forEach((issue, idx) => {
+        const li = document.createElement('li');
+        li.className = 'tc-issue tc-issue-expandable';
+        li.style.borderColor = issue.category === 'critical' ? '#dc3545' :
+          issue.category === 'warning' ? '#fd7e14' :
+            '#28a745';
+        li.style.borderLeftColor = li.style.borderColor;
+        li.style.background = '#fff';
+
+        const detailsId = `tc-issue-details-${idx}`;
+        li.innerHTML = `
+            <div class="tc-issue-content">
+              <div class="tc-issue-info">
+                <div class="tc-issue-name">
+                  ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>voir détails</span></span>
+                </div>
+                <div class="tc-issue-description">${issue.description}</div>
+              </div>
+              <span class="tc-issue-points" style="background:${li.style.borderColor};">
+                ${issue.points} pts
+              </span>
+            </div>
+            <div id="${detailsId}" class="tc-issue-details">${issue.details}</div>
+          `;
+
+        elements.issues.appendChild(li);
+      });
+    }
+
   }
 
 })();

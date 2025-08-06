@@ -601,7 +601,7 @@
             </div>
             <div class="tc-header">
               <h1>Ton tracking tient-il la route ?</h1>
-              <p>Découvrez les failles de votre tracking en 60 secondes</p>
+              <p>Découvre les failles de votre tracking en 60 secondes</p>
             </div>
           </div>
         </div>
@@ -768,12 +768,40 @@
             },
             {
                 name: "Outils de suivis intégrés en dur",
-                regex: /graph\.facebook\.com|snap\.licdn\.com\/li\.lms-analytics\/insight\.min\.js|px\.ads\.linkedin\.com\/collect|analytics\.tiktok\.com\/i18n\/pixel\/events\.js|business\.tiktok\.com|s\.pinimg\.com\/ct\/lib\/main\.[^/]+\.js|ct\.pinterest\.com\/v3\/|static\.ads-twitter\.com\/uwt\.js|analytics\.twitter\.com\/i\/adsct|js\.hs-scripts\.com|js\.hs-analytics\.com|hs-analytics\.net|hscollectedforms\.net|static\.hotjar\.com\/c\/hotjar-[^/]+\.js|script\.hotjar\.com\/modules\.[^/]+\.js|vars\.hotjar\.com|www\.clarity\.ms\/tag\/|bat\.bing\.com\/bat\.js|cdn\.callrail\.com|t\.calltrk\.com|cdn\.nimbata\.com|track\.nimbata\.com|sp\.analytics\.spotify\.com|spclient\.wg\.spotify\.com|cdn\.segment\.com|script\.crazyegg\.com|cdn\.mouseflow\.com|cdn\.optimizely\.com|munchkin\.marketo\.net|pi\.pardot\.com/i,
+                regex: /(snap\.licdn\.com|px\.ads\.linkedin\.com|analytics\.tiktok\.com|business\.tiktok\.com|s\.pinimg\.com|ct\.pinterest\.com|static\.ads-twitter\.com|analytics\.twitter\.com|js\.hs-scripts\.com|js\.hs-analytics\.com|static\.hotjar\.com|script\.hotjar\.com|vars\.hotjar\.com|www\.clarity\.ms|bat\.bing\.com|cdn\.callrail\.com|t\.calltrk\.com|cdn\.nimbata\.com|track\.nimbata\.com|sp\.analytics\.spotify\.com|spclient\.wg\.spotify\.com|cdn\.segment\.com|script\.crazyegg\.com|munchkin\.marketo\.net|pi\.pardot\.com)/,
                 points: -10,
                 category: "warning",
-                description: "Tracking Facebook hors GTM = difficile à maintenir, non conforme",
+                description: "Intégration de l'outil X en dur non centralisé dans GTM", // Sera remplacé dynamiquement
                 details: "Les pixels de réseaux sociaux sont chargés directement, rendant difficile leur gestion et conformité.",
-                recommendation: "Centraliser via GTM"
+                recommendation: "Centraliser via GTM",
+                // Mapping des domaines vers les noms d'outils
+                toolMapping: {
+                    'snap.licdn.com': 'LinkedIn',
+                    'px.ads.linkedin.com': 'LinkedIn',
+                    'analytics.tiktok.com': 'TikTok',
+                    'business.tiktok.com': 'TikTok',
+                    's.pinimg.com': 'Pinterest',
+                    'ct.pinterest.com': 'Pinterest',
+                    'static.ads-twitter.com': 'Twitter',
+                    'analytics.twitter.com': 'Twitter',
+                    'js.hs-scripts.com': 'HubSpot',
+                    'js.hs-analytics.com': 'HubSpot',
+                    'static.hotjar.com': 'Hotjar',
+                    'script.hotjar.com': 'Hotjar',
+                    'vars.hotjar.com': 'Hotjar',
+                    'www.clarity.ms': 'Microsoft Clarity',
+                    'bat.bing.com': 'Microsoft Advertising',
+                    'cdn.callrail.com': 'CallRail',
+                    't.calltrk.com': 'CallTrackingMetrics',
+                    'cdn.nimbata.com': 'Nimbata',
+                    'track.nimbata.com': 'Nimbata',
+                    'sp.analytics.spotify.com': 'Spotify',
+                    'spclient.wg.spotify.com': 'Spotify',
+                    'cdn.segment.com': 'Segment',
+                    'script.crazyegg.com': 'Crazy Egg',
+                    'munchkin.marketo.net': 'Marketo',
+                    'pi.pardot.com': 'Pardot'
+                }
             },
             {
                 name: "Server-side tracking non détecté",
@@ -821,7 +849,7 @@
 
             if (isExpanded) {
                 details.classList.remove('expanded');
-                details.previousElementSibling.querySelector('.tc-toggle-text').textContent = 'voir détails';
+                details.previousElementSibling.querySelector('.tc-toggle-text').textContent = 'détails';
             } else {
                 details.classList.add('expanded');
                 details.previousElementSibling.querySelector('.tc-toggle-text').textContent = 'masquer';
@@ -905,7 +933,40 @@
 
                 if (isIssue) {
                     score += rule.points;
-                    allIssues.push(rule);
+
+                    // Traitement spécial pour la règle des outils intégrés
+                    if (rule.name === "Outils de suivis intégrés en dur" && rule.toolMapping) {
+                        const detectedTools = [];
+                        const matches = html.match(rule.regex) || [];
+
+                        // Extraire tous les domaines détectés
+                        Object.keys(rule.toolMapping).forEach(domain => {
+                            if (html.includes(domain)) {
+                                const toolName = rule.toolMapping[domain];
+                                if (!detectedTools.includes(toolName)) {
+                                    detectedTools.push(toolName);
+                                }
+                            }
+                        });
+
+                        // Générer la description dynamique
+                        let dynamicDescription;
+                        if (detectedTools.length === 1) {
+                            dynamicDescription = `Intégration de l'outil ${detectedTools[0]} en dur et non centralisé dans GTM`;
+                        } else if (detectedTools.length > 1) {
+                            const lastTool = detectedTools.pop();
+                            dynamicDescription = `Intégrations des outils ${detectedTools.join(', ')} et ${lastTool} en dur et non centralisé dans GTM`;
+                        } else {
+                            dynamicDescription = rule.description; // Fallback
+                        }
+
+                        // Créer une copie de la règle avec la description dynamique
+                        const dynamicRule = { ...rule, description: dynamicDescription };
+                        allIssues.push(dynamicRule);
+                    } else {
+                        allIssues.push(rule);
+                    }
+
                     console.log(`⚠️ Règle déclenchée : ${rule.name}`);
                 } else {
                     console.log(`✅ Conforme : ${rule.name}`);
@@ -922,7 +983,7 @@
             displayIssues(allIssues);
 
             console.log('🎯 Score final :', score);
-            console.log('📊 Nombre d’issues :', allIssues.length);
+            console.log('📊 Nombre d\'issues :', allIssues.length);
         }
 
 
@@ -1038,7 +1099,7 @@
             <div class="tc-issue-content">
               <div class="tc-issue-info">
                 <div class="tc-issue-name">
-                  ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>voir détails</span><span class='tc-toggle-arrow'>▼</span></span>
+                  ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>détails</span><span class='tc-toggle-arrow'>▼</span></span>
                 </div>
                 <div class="tc-issue-description">${issue.description}</div>
               </div>

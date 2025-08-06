@@ -494,11 +494,33 @@
       }
       
       .tc-issue-toggle {
-        color: #004aad;
-        font-size: 0.8em;
-        margin-left: 10px;
-        font-weight: 500;
+        background: #004aad;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75em;
+        text-decoration: none;
+        margin-left: 8px;
         cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .tc-issue-toggle:hover {
+        background: #0056cc;
+        transform: translateY(-1px);
+      }
+      
+      .tc-toggle-arrow {
+        font-size: 10px;
+        transition: transform 0.3s ease;
+      }
+      
+      .tc-toggle-arrow.rotated {
+        transform: rotate(180deg);
       }
       
       .tc-recommendation-link {
@@ -1016,7 +1038,7 @@
             <div class="tc-issue-content">
               <div class="tc-issue-info">
                 <div class="tc-issue-name">
-                  ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>voir détails</span></span>
+                  ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>voir détails</span><span class='tc-toggle-arrow'>▼</span></span>
                 </div>
                 <div class="tc-issue-description">${issue.description}</div>
               </div>

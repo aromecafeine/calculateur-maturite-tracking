@@ -457,11 +457,6 @@
         gap: 10px;
       }
       
-      .tc-issue-description {
-        color: #666;
-        font-size: 0.9em;
-      }
-      
       .tc-issue-points {
         color: white;
         padding: 4px 12px;
@@ -720,51 +715,46 @@
         // Règles de scoring basées exactement sur votre document
         const rules = [
             {
-                name: "Absence de Google Tag Manager",
+                name: "Absence de GTM",
                 regex: /gtm\.js/i,
                 points: -30,
                 invert: true,
                 category: "critical",
-                description: "Aucune gouvernance des balises → site non industrialisé",
                 details: "GTM centralise la gestion de tous vos tags marketing et analytics. Sans GTM, vous perdez en flexibilité et en contrôle sur vos données.",
-                recommendation: "Installer GTM immédiatement"
+                recommendation: "Créer et configurer un GTM"
             },
             {
-                name: "GA4 intégré en dur (gtag.js)",
+                name: "Google Analytics 4 installé en dur",
                 regex: /\/gtag\/js\?id=G-/i,
                 points: -15,
                 category: "warning",
-                description: "Balise injectée sans GTM = tracking rigide, peu maintenable",
-                details: "GA4 est installé directement dans le code source au lieu d'être géré via GTM. Cela réduit votre flexibilité.",
-                recommendation: "Migrer GA4 vers GTM"
+                details: "GA4 est installé directement dans le code source au lieu d'être géré via GTM.",
+                recommendation: "Basculer le suivi de GA4 à travers GTM"
             },
             {
-                name: "Universal Analytics toujours actif",
+                name: "Universal Analytics toujours présent",
                 regex: /analytics\.js|UA-[0-9]+/i,
                 points: -5,
                 category: "critical",
-                description: "analytics.js ou UA-XXXXX toujours présent = technologie obsolète",
-                details: "Universal Analytics a cessé de fonctionner en juillet 2023. Vos données ne sont plus collectées.",
-                recommendation: "Migrer vers GA4 - urgence absolue"
+                details: "Universal Analytics a cessé de fonctionner en juillet 2023. Cet outil est obsolète et plus aucune donnée n'est collectée.",
+                recommendation: "Valider la présence de GA4 et retirer Universal Analytics"
             },
             {
-                name: "Absence de bandeau ou CMP détectable",
+                name: "Aucune CMP reconnue mise en place",
                 regex: /sdk\.privacy-center\.org|sdk\.didomi\.io|scripts\.didomi\.io|api\.didomi\.io|static\.axept\.io|www\.axept\.io|cookie\.sirdata\.com|cmp\.sirdata\.com|cdn\.sirdata\.com|cdn-cookieyes\.com|cdn-cookieyes\.io|app\.cookieyes\.com|cdn\.iubenda\.com|iubenda\.com\/cmp|consent\.iubenda\.com|app\.usercentrics\.eu|consent\.cookiebot\.com|consentcdn\.cookiebot\.com|choice\.quantcast\.com|cmp\.quantcast\.com|consent\.trustarc\.com|cdn\.trustcommander\.net|cdn\.cookielaw\.org|cdn\.cookielaw\.net|cookie-cdn\.onetrust\.com|cmp\.[a-z0-9.-]+|consent\.[a-z0-9.-]+/i,
                 points: -15,
                 invert: true,
                 category: "critical",
-                description: "Pas de axeptio, tarteaucitron, cookiebot... détecté dans le code HTML",
                 details: "Le RGPD impose une gestion stricte des cookies. Sans CMP, vous risquez des amendes importantes.",
-                recommendation: "Installer un CMP conforme RGPD"
+                recommendation: "Installer une CMP conforme RGPD"
             },
             {
-                name: "Outils de suivis intégrés en dur",
+                name: "Intégration de l'outil X en dur non centralisé dans GTM", // Sera remplacé dynamiquement
                 regex: /(snap\.licdn\.com|px\.ads\.linkedin\.com|analytics\.tiktok\.com|business\.tiktok\.com|s\.pinimg\.com|ct\.pinterest\.com|static\.ads-twitter\.com|analytics\.twitter\.com|js\.hs-scripts\.com|js\.hs-analytics\.com|static\.hotjar\.com|script\.hotjar\.com|vars\.hotjar\.com|www\.clarity\.ms|bat\.bing\.com|cdn\.callrail\.com|t\.calltrk\.com|cdn\.nimbata\.com|track\.nimbata\.com|sp\.analytics\.spotify\.com|spclient\.wg\.spotify\.com|cdn\.segment\.com|script\.crazyegg\.com|munchkin\.marketo\.net|pi\.pardot\.com)/,
                 points: -25,
                 category: "warning",
-                description: "Intégration de l'outil X en dur non centralisé dans GTM", // Sera remplacé dynamiquement
-                details: "Les pixels de réseaux sociaux sont chargés directement, rendant difficile leur gestion et conformité.",
-                recommendation: "Centraliser via GTM",
+                details: "Des pixels tiers sont intégrés en dur rendant difficile leur gestion et conformité.",
+                recommendation: "Centraliser ces suivis via GTM",
                 // Mapping des domaines vers les noms d'outils
                 toolMapping: {
                     'snap.licdn.com': 'LinkedIn',
@@ -795,23 +785,20 @@
                 }
             },
             {
-                name: "Server-side tracking non détecté",
+                name: "Absence d'implémentation Server-Side",
                 regex: /(analytics|sst|tracking)\.[a-zA-Z0-9.-]+/i,
                 points: -10,
                 invert: true,
                 category: "warning",
-                description: "Pas de server-side détecté (sous-domaine analytics., sst., tracking.)",
-                details: "Le tracking client-side est limité par les bloqueurs de pub et les restrictions navigateurs.",
-                recommendation: "Implémenter le server-side tracking"
+                details: "Le tracking Client-Side est limité par les bloqueurs de pub et les restrictions navigateurs.",
+                recommendation: "Implémenter un tracking Server-Side"
             },
             {
-                name: "Solution Addingwell détectée",
+                name: "Server-Side Addingwell implémenté",
                 regex: /\.js\?aw='\+i\.replace\(\/\^GTM-\/, ''\)/i,
                 points: +5,
                 category: "positive",
-                description: "Excellente pratique ! Solution de tracking avancé détectée",
-                details: "Addingwell offre une solution server-side premium pour optimiser la collecte de données.",
-                recommendation: "Continuer sur cette voie"
+                details: "Addingwell offre une solution Server-Side premium pour optimiser la collecte de données."
             }
         ];
 
@@ -926,9 +913,8 @@
                     score += rule.points;
 
                     // Traitement spécial pour la règle des outils intégrés
-                    if (rule.name === "Outils de suivis intégrés en dur" && rule.toolMapping) {
+                    if (rule.name === "Intégration de l'outil X en dur non centralisé dans GTM" && rule.toolMapping) {
                         const detectedTools = [];
-                        const matches = html.match(rule.regex) || [];
 
                         // Extraire tous les domaines détectés
                         Object.keys(rule.toolMapping).forEach(domain => {
@@ -940,19 +926,19 @@
                             }
                         });
 
-                        // Générer la description dynamique
-                        let dynamicDescription;
+                        // Générer le nom dynamique
+                        let dynamicName;
                         if (detectedTools.length === 1) {
-                            dynamicDescription = `Intégration de l'outil ${detectedTools[0]} en dur et non centralisé dans GTM`;
+                            dynamicName = `Intégration de l'outil ${detectedTools[0]} en dur et non centralisé dans GTM`;
                         } else if (detectedTools.length > 1) {
                             const lastTool = detectedTools.pop();
-                            dynamicDescription = `Intégrations des outils ${detectedTools.join(', ')} et ${lastTool} en dur et non centralisé dans GTM`;
+                            dynamicName = `Intégrations des outils ${detectedTools.join(', ')} et ${lastTool} en dur et non centralisé dans GTM`;
                         } else {
-                            dynamicDescription = rule.description; // Fallback
+                            dynamicName = rule.name; // Fallback
                         }
 
-                        // Créer une copie de la règle avec la description dynamique
-                        const dynamicRule = { ...rule, description: dynamicDescription };
+                        // Créer une copie de la règle avec le nom dynamique
+                        const dynamicRule = { ...rule, name: dynamicName };
                         allIssues.push(dynamicRule);
                     } else {
                         allIssues.push(rule);
@@ -1059,6 +1045,7 @@
                     : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
 
             elements.recommendationsContent.innerHTML = issues
+                .filter(i => i.recommendation) // Filtre seulement les issues avec recommandation
                 .map(i => `• ${i.recommendation}`)
                 .join('<br>');
         }
@@ -1092,7 +1079,6 @@
                 <div class="tc-issue-name">
                   ${issue.name} <span class="tc-issue-toggle" onclick="toggleDetails('${detailsId}')"><span class='tc-toggle-text'>détails</span><span class='tc-toggle-arrow'>▼</span></span>
                 </div>
-                <div class="tc-issue-description">${issue.description}</div>
               </div>
               <span class="tc-issue-points" style="background:${li.style.borderColor};">
                 ${issue.points} pts
@@ -1106,5 +1092,4 @@
         }
 
     }
-
 })();

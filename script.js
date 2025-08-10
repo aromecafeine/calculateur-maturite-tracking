@@ -152,25 +152,17 @@ body {
 .tc-score-status { font-size:1.3em; font-weight:600; margin-bottom:10px; color:#004aad; }
 .tc-score-description { color:#666; line-height:1.5; margin-bottom:12px; }
 
-/* ✅ Points bien faits */
-.tc-good-points-title { font-weight:600; color:#28a745; margin: 10px 0 6px 0; }
+/* ✅ Liste des points conformes (sans titre) */
 .tc-good-points { list-style:none; padding:0; margin:0 0 12px 0; color:#2d6a4f; }
 .tc-good-points li { margin:4px 0; }
 
-/* Section Recommandation (sans cadre) */
-.tc-recommendations { background: transparent; border-left: 0; padding: 0; border-radius: 0; }
-.tc-recommendations-title { font-weight:700; color:#004aad; margin: 14px 0 6px 0; }
-.tc-recommendations-content { color:#333; font-size:0.95em; line-height:1.5; }
-.tc-recommendations-content ol { margin: 0 0 0 20px; padding:0; }
-.tc-recommendations-content li { margin:6px 0; }
+/* Titres de sections plein-largeur */
+.tc-issues-section { margin-top: 20px; }
+.tc-issues-title { font-size:1.2em; font-weight:600; color:#004aad; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
 
 /* Liste des issues */
-.tc-issues-section { margin-top: 30px; }
-.tc-issues-title { font-size:1.2em; font-weight:600; color:#004aad; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
 .tc-issues { list-style:none; padding:0; margin:0; }
 .tc-issue { border-radius:12px; padding:15px; margin-bottom:12px; border:1px solid; border-left:4px solid; }
-
-/* FIX TOGGLE PADDING */
 .tc-issue-content { display:flex; justify-content:space-between; align-items:flex-start; gap:15px; padding:5px 0; }
 .tc-issue-info { flex:1; min-width:0; padding-right:10px; }
 .tc-issue-name { color:#333; font-weight:500; margin-bottom:4px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; line-height:1.4; }
@@ -178,7 +170,6 @@ body {
 
 .tc-issue-expandable { cursor:pointer; transition:all .3s ease; }
 .tc-issue-expandable:hover { background-color: rgba(0,74,173,.05); }
-
 .tc-issue-details { margin-top:10px; padding-top:10px; border-top:1px solid #e0e0e0; display:none; font-size:.9em; color:#666; line-height:1.5; }
 .tc-issue-details.expanded { display:block; }
 
@@ -187,14 +178,15 @@ body {
 .tc-toggle-arrow { font-size:10px; transition: transform .3s ease; }
 .tc-toggle-arrow.rotated { transform: rotate(180deg); }
 
-.tc-recommendation-link { display:inline-block; background:#004aad; color:#fff; padding:2px 8px; border-radius:12px; font-size:.75em; text-decoration:none; margin-left:8px; cursor:pointer; }
-.tc-recommendation-link:hover { background:#0056cc; }
+.tc-recommendations-content { color:#333; font-size:0.95em; line-height:1.5; }
+.tc-recommendations-content ol { margin: 0 0 0 20px; padding:0; }
+.tc-recommendations-content li { margin:6px 0; }
 
 .tc-error { display:none; background:#ffe6e6; border:1px solid #ffcccc; border-radius:12px; padding:20px; color:#cc0000; text-align:center; margin-top:20px; }
 
 @keyframes spin { 0% {transform:rotate(0deg);} 100% {transform:rotate(360deg);} }
 
-/* Responsive (inchangé sauf ajustements mineurs pour nouvelles sections) */
+/* Responsive */
 @media(max-width: 768px) {
   body { padding:10px; align-items:flex-start; padding-top:20px; }
   #tc-calculator { margin:0; border-radius:16px; max-width:100%; }
@@ -208,9 +200,9 @@ body {
   .tc-contact-grid { grid-template-columns:1fr; gap:15px; }
   .tc-url-section { flex-direction:column; }
   .tc-score-display { flex-direction:column; text-align:center; gap:20px; }
-  .tc-gauge-container { width:140; height:140px; }
+  .tc-gauge-container { width:140px; height:140px; }
   .tc-gauge-score-value { font-size:1.6em; }
-  .tc-issues-section { margin-top:25px; }
+  .tc-issues-section { margin-top:20px; }
   .tc-issue { padding:12px; margin-bottom:10px; }
   .tc-issue-content { flex-direction:column; align-items:flex-start; gap:12px; }
   .tc-issue-info { padding-right:0; width:100%; }
@@ -321,23 +313,25 @@ body {
               </div>
 
               <div class="tc-score-info">
-  <div id="tc-score-status" class="tc-score-status">Bon niveau</div>
-  <div id="tc-score-description" class="tc-score-description">
-    Votre site présente une configuration tracking correcte.
-  </div>
+                <div id="tc-score-status" class="tc-score-status">Bon niveau</div>
+                <div id="tc-score-description" class="tc-score-description">
+                  Votre site présente une configuration tracking correcte.
+                </div>
 
-  <!-- Liste directe des bons points sans titre -->
-  <ul id="tc-good-points" class="tc-good-points"></ul>
+                <!-- Liste directe des bons points sans titre -->
+                <ul id="tc-good-points" class="tc-good-points"></ul>
+              </div>
+            </div><!-- /.tc-score-display -->
 
-  <!-- Recommandations au style "Explication du score" -->
-  <div class="tc-issues-section">
-    <div class="tc-issues-title">
-      <span>📌</span> Recommandations
-    </div>
-    <div id="tc-recommendations-content" class="tc-recommendations-content"></div>
-  </div>
-</div>
+            <!-- 📌 Recommandations (plein large, même style que ‘Explication du score’) -->
+            <div class="tc-issues-section" id="tc-reco-section">
+              <div class="tc-issues-title">
+                <span>📌</span> Recommandations
+              </div>
+              <div id="tc-recommendations-content" class="tc-recommendations-content"></div>
+            </div>
 
+            <!-- 🔍 Explication du score -->
             <div class="tc-issues-section">
               <div class="tc-issues-title">
                 <span>🔍</span> Explication du score
@@ -396,7 +390,7 @@ body {
         category: "critical",
         details: "GTM centralise la gestion de tous vos tags marketing et analytics. Sans GTM, vous perdez en flexibilité et en contrôle sur vos données.",
         recommendation: "Créer et configurer un GTM",
-        success: "GTM détecté et opérationnel"
+        success: "✅ GTM détecté et opérationnel"
       },
       {
         name: "Google Analytics 4 installé en dur",
@@ -405,7 +399,7 @@ body {
         category: "warning",
         details: "GA4 est installé directement dans le code source au lieu d'être géré via GTM.",
         recommendation: "Basculer le suivi de GA4 à travers GTM",
-        success: "GA4 non installé en dur"
+        success: "✅ GA4 non installé en dur"
       },
       {
         name: "Universal Analytics toujours présent",
@@ -414,7 +408,7 @@ body {
         category: "critical",
         details: "Universal Analytics a cessé de fonctionner en juillet 2023. Cet outil est obsolète et plus aucune donnée n'est collectée.",
         recommendation: "Valider la présence de GA4 et retirer Universal Analytics",
-        success: "Universal Analytics non détecté"
+        success: "✅ Universal Analytics non détecté"
       },
       {
         name: "Aucune CMP reconnue mise en place",
@@ -424,7 +418,7 @@ body {
         category: "critical",
         details: "Le RGPD impose une gestion stricte des cookies. Sans CMP, vous risquez des amendes importantes.",
         recommendation: "Installer une CMP conforme RGPD",
-        success: "CMP conforme détectée"
+        success: "✅ CMP conforme détectée"
       },
       {
         name: "Intégration de l'outil X en dur non centralisé dans GTM",
@@ -433,7 +427,7 @@ body {
         category: "warning",
         details: "Des pixels tiers sont intégrés en dur rendant difficile leur gestion et conformité.",
         recommendation: "Centraliser ces suivis via GTM",
-        success: "Aucun pixel tiers détecté en dur",
+        success: "✅ Aucun pixel tiers détecté en dur",
         toolMapping: {
           'snap.licdn.com': 'LinkedIn',
           'px.ads.linkedin.com': 'LinkedIn',
@@ -470,7 +464,7 @@ body {
         category: "warning",
         details: "Le tracking Client-Side est limité par les bloqueurs de pub et les restrictions navigateurs.",
         recommendation: "Implémenter un tracking Server-Side",
-        success: "Server-Side détecté"
+        success: "✅ Server-Side détecté"
       },
       {
         name: "Server-Side Addingwell implémenté",
@@ -478,7 +472,7 @@ body {
         points: +5,
         category: "positive",
         details: "Addingwell offre une solution Server-Side premium pour optimiser la collecte de données.",
-        success: "Addingwell Server-Side détecté"
+        success: "✅ Addingwell Server-Side détecté"
       }
     ];
 
@@ -602,7 +596,7 @@ body {
 
           console.log(`⚠️ Règle déclenchée : ${rule.name}`);
         } else {
-          // ✅ Bon point
+          // ✅ Bon point (affiché sans titre)
           if (rule.success) {
             allGoods.push(rule.success);
           }
@@ -657,7 +651,7 @@ body {
       });
     }
 
-    // Ajout: tri par gravité (critical > warning > autres) puis par impact (points décroissants absolus)
+    // Tri par gravité (critical > warning > autres) puis par impact (points décroissants absolus)
     function sortByPriority(issues) {
       const weight = { critical: 2, warning: 1, positive: 0 };
       return [...issues].sort((a, b) => {
@@ -670,22 +664,24 @@ body {
       });
     }
 
-    /** Description globale + ✅ bons points + Recommandation numérotée */
+    /** Description globale + ✅ bons points + Recommandations numérotées (plein large) */
     function displayScoreDetails(score, issues, goods) {
       elements.scoreDescription.textContent =
         issues.length === 0
           ? "Configuration optimale détectée."
           : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
 
-      // Liste directe des bons points
+      // ✅ Points conformes (liste simple)
       elements.goodPoints.innerHTML = goods.length
-        ? goods.map(g => `<li>✅ ${g}</li>`).join('')
+        ? goods.map(g => `<li>${g}</li>`).join('')
         : '';
 
       // Recommandations priorisées
       const prioritized = sortByPriority(issues).filter(i => i.recommendation);
       if (prioritized.length) {
-        const list = prioritized.map(i => `<li><strong>${i.recommendation}</strong></li>`).join('');
+        const list = prioritized
+          .map(i => `<li><strong>${i.recommendation}</strong></li>`)
+          .join('');
         elements.recommendationsContent.innerHTML = `<ol>${list}</ol>`;
       } else {
         elements.recommendationsContent.innerHTML = `<p>Aucune action critique détectée.</p>`;
@@ -706,14 +702,14 @@ body {
         return;
       }
 
-      // Garder l'ordre initial d’affichage détaillé
       issues.forEach((issue, idx) => {
-        const li = document.createElement('li');
-        li.className = 'tc-issue tc-issue-expandable';
-        li.style.borderColor = issue.category === 'critical' ? '#dc3545' :
+        const borderColor = issue.category === 'critical' ? '#dc3545' :
           issue.category === 'warning' ? '#fd7e14' :
             '#28a745';
-        li.style.borderLeftColor = li.style.borderColor;
+        const li = document.createElement('li');
+        li.className = 'tc-issue tc-issue-expandable';
+        li.style.borderColor = borderColor;
+        li.style.borderLeftColor = borderColor;
         li.style.background = '#fff';
 
         const detailsId = `tc-issue-details-${idx}`;
@@ -727,7 +723,7 @@ body {
                 </span>
               </div>
             </div>
-            <span class="tc-issue-points" style="background:${li.style.borderColor};">
+            <span class="tc-issue-points" style="background:${borderColor};">
               ${issue.points} pts
             </span>
           </div>

@@ -580,6 +580,18 @@ body {
     border-radius: 16px;
     max-width: 100%;
   }
+
+  .tc-button {
+    padding: 14px 25px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+  
+  .tc-button-secondary {
+    padding: 12px 20px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
   
   .tc-hero-section {
     padding: 40px 20px 30px;
@@ -619,8 +631,8 @@ body {
   }
   
   .tc-gauge-container {
-    width: 120px;
-    height: 120px;
+    width: 140;
+    height: 140px;
   }
   
   .tc-gauge-score-value {
@@ -703,13 +715,13 @@ body {
   }
   
   .tc-button {
-    padding: 16px 30px;
-    font-size: 15px;
+    padding: 12px 20px;
+    font-size: 14px;
   }
   
   .tc-button-secondary {
-    padding: 14px 25px;
-    font-size: 15px;
+    padding: 10px 18px;
+    font-size: 14px;
   }
   
   .tc-score-status {
@@ -717,8 +729,8 @@ body {
   }
   
   .tc-gauge-container {
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 130px;
   }
   
   .tc-gauge-score-value {
@@ -774,7 +786,7 @@ body {
             </div>
             <div class="tc-header">
               <h1>Ton tracking tient-il la route ?</h1>
-              <p>Découvre les failles de votre tracking en <strong>moins de 30 secondes</strong></p>
+              <p>Découvre les failles de ton tracking en <strong>moins de 30 secondes</strong>.</p>
             </div>
           </div>
         </div>
@@ -919,7 +931,7 @@ body {
       },
       {
         name: "Aucune CMP reconnue mise en place",
-        regex: /sdk\.privacy-center\.org|sdk\.didomi\.io|scripts\.didomi\.io|api\.didomi\.io|static\.axept\.io|www\.axept\.io|cookie\.sirdata\.com|cmp\.sirdata\.com|cdn\.sirdata\.com|cdn-cookieyes\.com|cdn-cookieyes\.io|app\.cookieyes\.com|cdn\.iubenda\.com|iubenda\.com\/cmp|consent\.iubenda\.com|app\.usercentrics\.eu|consent\.cookiebot\.com|consentcdn\.cookiebot\.com|choice\.quantcast\.com|cmp\.quantcast\.com|consent\.trustarc\.com|cdn\.trustcommander\.net|cdn\.cookielaw\.org|cdn\.cookielaw\.net|cookie-cdn\.onetrust\.com|cmp\.[a-z0-9.-]+|consent\.[a-z0-9.-]+/i,
+        regex: /sdk\.privacy-center\.org|sdk\.didomi\.io|scripts\.didomi\.io|api\.didomi\.io|static\.axept\.io|www\.axept\.io|cookie\.sirdata\.com|cmp\.sirdata\.com|cdn\.sirdata\.com|cdn-cookieyes\.com|cdn-cookieyes\.io|app\.cookieyes\.com|cdn\.iubenda\.com|iubenda\.com\/cmp|consent\.iubenda\.com|app\.usercentrics\.eu|consent\.cookiebot\.com|consentcdn\.cookiebot\.com|choice\.quantcast\.com|cmp\.quantcast\.com|consent\.trustarc\.com|cdn\.trustcommander\.net|cdn\.cookielaw\.org|cdn\.cookielaw\.net|cookie-cdn\.onetrust\.com/i,
         points: -15,
         invert: true,
         category: "critical",

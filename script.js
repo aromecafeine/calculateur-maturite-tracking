@@ -595,6 +595,7 @@ body {
     padding: 12px 20px;
     font-size: 15px;
     border-radius: 12px;
+    margin-right: 10px; /* Réduit l'écart entre les boutons */
   }
   
   .tc-hero-section {
@@ -726,6 +727,7 @@ body {
   .tc-button-secondary {
     padding: 10px 18px;
     font-size: 14px;
+    margin-right: 8px; /* Réduit encore plus l'écart sur très petits écrans */
   }
   
   .tc-score-status {
@@ -761,6 +763,10 @@ body {
   .tc-button {
     padding: 12px 12px;
     font-size: 12px; /* Taille minimale pour très petits écrans */
+  }
+  
+  .tc-button-secondary {
+    margin-right: 6px; /* Écart minimal sur très petits écrans */
   }
   
   .tc-main-content {

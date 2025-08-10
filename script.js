@@ -280,6 +280,9 @@ body {
   font-family: 'Poppins', sans-serif;
   width: 100%;
   box-shadow: 0 8px 24px rgba(0, 74, 173, 0.2);
+  white-space: nowrap; /* Empêche le retour à la ligne */
+  overflow: hidden; /* Cache le texte qui déborde */
+  text-overflow: ellipsis; /* Ajoute ... si le texte est trop long */
 }
 
 .tc-button:hover:not(:disabled) {
@@ -582,9 +585,10 @@ body {
   }
 
   .tc-button {
-    padding: 14px 25px;
-    font-size: 15px;
+    padding: 14px 20px; /* Réduit le padding horizontal pour laisser plus de place au texte */
+    font-size: 14px; /* Réduit légèrement la taille de police */
     border-radius: 12px;
+    min-width: 0; /* Permet au bouton de se rétrécir si nécessaire */
   }
   
   .tc-button-secondary {
@@ -715,8 +719,8 @@ body {
   }
   
   .tc-button {
-    padding: 12px 20px;
-    font-size: 14px;
+    padding: 12px 15px;
+    font-size: 13px;
   }
   
   .tc-button-secondary {
@@ -752,6 +756,11 @@ body {
 @media(max-width: 360px) {
   .tc-header h1 {
     font-size: 1.6em;
+  }
+
+  .tc-button {
+    padding: 12px 12px;
+    font-size: 12px; /* Taille minimale pour très petits écrans */
   }
   
   .tc-main-content {

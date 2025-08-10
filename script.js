@@ -321,24 +321,22 @@ body {
               </div>
 
               <div class="tc-score-info">
-                <div id="tc-score-status" class="tc-score-status">Bon niveau</div>
-                <div id="tc-score-description" class="tc-score-description">
-                  Votre site présente une configuration tracking correcte.
-                </div>
+  <div id="tc-score-status" class="tc-score-status">Bon niveau</div>
+  <div id="tc-score-description" class="tc-score-description">
+    Votre site présente une configuration tracking correcte.
+  </div>
 
-                <!-- ✅ Points bien faits -->
-                <div id="tc-good-points-wrap" class="tc-good-points-wrap">
-                  <div class="tc-good-points-title">✅ Points conformes</div>
-                  <ul id="tc-good-points" class="tc-good-points"></ul>
-                </div>
+  <!-- Liste directe des bons points sans titre -->
+  <ul id="tc-good-points" class="tc-good-points"></ul>
 
-                <!-- Recommandation (sans cadre) -->
-                <div class="tc-recommendations">
-                  <div class="tc-recommendations-title">Recommandation</div>
-                  <div id="tc-recommendations-content" class="tc-recommendations-content"></div>
-                </div>
-              </div>
-            </div>
+  <!-- Recommandations au style "Explication du score" -->
+  <div class="tc-issues-section">
+    <div class="tc-issues-title">
+      <span>📌</span> Recommandations
+    </div>
+    <div id="tc-recommendations-content" class="tc-recommendations-content"></div>
+  </div>
+</div>
 
             <div class="tc-issues-section">
               <div class="tc-issues-title">
@@ -679,18 +677,18 @@ body {
           ? "Configuration optimale détectée."
           : "Des points d'amélioration sont détectés. Consultez les recommandations ci-dessous.";
 
-      // ✅ Points conformes
+      // Liste directe des bons points
       elements.goodPoints.innerHTML = goods.length
         ? goods.map(g => `<li>✅ ${g}</li>`).join('')
-        : `<li>—</li>`;
+        : '';
 
-      // Recommandation (numérotée, priorisée)
+      // Recommandations priorisées
       const prioritized = sortByPriority(issues).filter(i => i.recommendation);
       if (prioritized.length) {
         const list = prioritized.map(i => `<li><strong>${i.recommendation}</strong></li>`).join('');
         elements.recommendationsContent.innerHTML = `<ol>${list}</ol>`;
       } else {
-        elements.recommendationsContent.innerHTML = `<ol><li><strong>Aucune action critique détectée.</strong></li></ol>`;
+        elements.recommendationsContent.innerHTML = `<p>Aucune action critique détectée.</p>`;
       }
     }
 

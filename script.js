@@ -823,21 +823,21 @@ body {
           <!--Étape 2: Contact-->
           <div class="tc-contact-step" id="contact-step">
             <div class="tc-step-title">
-              Vos informations pour recevoir le rapport
+              Tes informations pour générer le rapport
             </div>
             <div class="tc-contact-form">
               <div class="tc-contact-grid">
                 <div class="tc-input-group name">
-                  <input id="tc-name" class="tc-input" type="text" placeholder="Votre prénom" required>
+                  <input id="tc-name" class="tc-input" type="text" placeholder="Ton prénom" required>
                 </div>
                 <div class="tc-input-group email">
-                  <input id="tc-email" class="tc-input" type="email" placeholder="Votre email" required>
+                  <input id="tc-email" class="tc-input" type="email" placeholder="Ton email" required>
                 </div>
               </div>
               <div style="display: flex; gap: 15px; align-items: center;">
                 <button id="tc-back-btn" class="tc-button-secondary">← Retour</button>
                 <button id="tc-scan-btn" class="tc-button" style="flex: 1;">
-                  <span id="tc-btn-text">🚀 Lancer mon analyse</span>
+                  <span id="tc-btn-text">🚀 Lancer l'analyse</span>
                 </button>
               </div>
             </div>

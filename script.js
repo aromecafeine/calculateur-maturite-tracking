@@ -209,6 +209,7 @@ body {
   .tc-issue-name { flex-direction:column; align-items:flex-start; gap:8px; }
   .tc-issue-toggle { margin-left:0; align-self:flex-start; }
   .tc-issue-points { align-self:flex-end; margin-top:-30px; }
+  .tc-good-points { text-align: left; padding-left: 20px; }
 }
 
 @media(max-width: 480px) {
@@ -226,6 +227,7 @@ body {
   .tc-gauge-score-value { font-size:1.4em; }
   .tc-issue-toggle { font-size:.7em; padding:5px 10px; }
   .tc-issue-points { font-size:.8em; padding:5px 10px; }
+  .tc-good-points { text-align: left; padding-left: 20px; }
 }
 
 @media(max-width: 360px) {
@@ -234,6 +236,7 @@ body {
   .tc-button-secondary { margin-right:6px; }
   .tc-main-content { padding:20px 12px; }
   .tc-hero-section { padding:25px 12px 20px; }
+  .tc-good-points { text-align: left; padding-left: 20px; }
 }
     `;
 
